@@ -1,0 +1,24 @@
+# зависимости
+node_modules/
+
+# секреты — в репозиторий не попадают никогда
+.env
+.env.*
+extension/config.js
+serviceAccount*.json
+**/serviceAccount*.json
+firebase/functions/.secret.local
+
+# локальная база разработки
+server/.devdata/
+
+# логи
+*-debug.log
+npm-debug.log*
+
+# сборка расширения
+extension/*.zip
+
+# прочее
+.DS_Store
+Thumbs.db

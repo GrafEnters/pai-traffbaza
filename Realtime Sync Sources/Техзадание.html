@@ -1,0 +1,537 @@
+<title>Realtime Inventory Sync</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#F5F5F9; --surface:#FFFFFF; --surface2:#EEEEF4; --line:#E2E2EC;
+  --ink:#1C1D2B; --muted:#6B6D84; --faint:#9A9CB2;
+  --accent:#5850C7; --accent2:#8A83E8; --accent-soft:#ECEBFB;
+  --ok:#1F8F45; --ok-soft:#E3F4E8; --warn:#B0740C; --warn-soft:#FBF1D8;
+  --code-bg:#14151F; --code-ink:#E7E7F2; --code-line:#2A2C3D; --code-key:#9FB8FF; --code-str:#8FD59A; --code-com:#6B6E86;
+  --shadow:0 8px 28px rgba(28,29,43,.10);
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --ui:'Manrope','Segoe UI',system-ui,-apple-system,sans-serif;
+  --disp:'Unbounded','Manrope',sans-serif;
+}
+:root:not([data-theme="light"]){ color-scheme:light dark; }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101019; --surface:#181926; --surface2:#20212F; --line:#2C2D40;
+  --ink:#E9E9F2; --muted:#9698B0; --faint:#6E7089;
+  --accent:#8A83E8; --accent2:#B0A9F5; --accent-soft:#26264180;
+  --ok:#4CC07A; --ok-soft:#18291f; --warn:#D9A94F; --warn-soft:#2f2717;
+  --code-bg:#0C0D15; --code-ink:#E7E7F2; --code-line:#22243244; --shadow:0 8px 28px rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  --bg:#101019; --surface:#181926; --surface2:#20212F; --line:#2C2D40;
+  --ink:#E9E9F2; --muted:#9698B0; --faint:#6E7089;
+  --accent:#8A83E8; --accent2:#B0A9F5; --accent-soft:#26264180;
+  --ok:#4CC07A; --ok-soft:#18291f; --warn:#D9A94F; --warn-soft:#2f2717;
+  --code-bg:#0C0D15; --code-ink:#E7E7F2; --code-line:#222432; --shadow:0 8px 28px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);line-height:1.6;margin:0;font-size:15.5px}
+.wrap{max-width:860px;margin:0 auto;padding:46px 24px 90px}
+header.hero{margin-bottom:38px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--disp);font-size:34px;line-height:1.12;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.badge{font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 12px;display:inline-flex;gap:6px;align-items:center}
+.b-ok{background:var(--ok-soft);color:var(--ok)}
+.b-do{background:var(--warn-soft);color:var(--warn)}
+.b-acc{background:var(--accent-soft);color:var(--accent)}
+.meta{margin-top:14px;font-size:13px;color:var(--faint);font-family:var(--mono)}
+section{margin:34px 0;scroll-margin-top:20px}
+h2{font-family:var(--disp);font-size:21px;margin:0 0 6px;letter-spacing:-.01em;display:flex;gap:12px;align-items:baseline}
+h2 .no{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:600;flex:none}
+h3{font-size:15.5px;font-weight:800;margin:22px 0 6px;color:var(--ink)}
+p{margin:9px 0}
+ul,ol{margin:9px 0;padding-left:22px}
+li{margin:5px 0}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.card.tight{padding:14px 18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}.wrap{padding:32px 16px 70px}h1{font-size:27px}}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.callout .t{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.callout.warn .t{color:var(--warn)}
+.codewrap{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid var(--code-line);background:var(--code-bg)}
+.codewrap .cap{font-family:var(--mono);font-size:11.5px;color:var(--code-com);padding:8px 14px;border-bottom:1px solid var(--code-line);background:rgba(255,255,255,.02);letter-spacing:.03em}
+textarea.code{display:block;width:100%;border:0;background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:12.5px;line-height:1.55;padding:14px;resize:vertical;white-space:pre;overflow:auto;tab-size:2}
+textarea.code:focus{outline:none}
+.steps{counter-reset:st;list-style:none;padding:0}
+.steps li{counter-increment:st;position:relative;padding:8px 0 8px 40px;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(st);position:absolute;left:0;top:7px;width:26px;height:26px;background:var(--accent-soft);color:var(--accent);border-radius:8px;font-family:var(--mono);font-weight:700;font-size:13px;display:grid;place-items:center}
+.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0;text-align:center;overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+table.tbl th,table.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:800}
+table.tbl td code{font-size:12px}
+.toc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 20px;margin:22px 0 8px;columns:2;column-gap:26px}
+@media(max-width:680px){.toc{columns:1}}
+.toc a{display:block;padding:3px 0;font-size:13.5px;color:var(--muted);border:0}
+.toc a:hover{color:var(--accent)}
+.toc a b{color:var(--accent);font-family:var(--mono);font-size:12px;margin-right:7px}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+.foot{color:var(--faint);font-size:13px;text-align:center;margin-top:40px}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Техническое задание</div>
+  <h1>Реалтайм-база FB-инвентаря</h1>
+  <p class="lede">Расширение в каждом профиле AdsPower при открытии Ads Manager само подтягивает все FB-ассеты (БМ / кабинеты / страницы / пиксели со всеми полями) в общую базу и постоянно их обновляет. База — веб-приложение на Firebase.</p>
+  <div class="badges">
+    <span class="badge b-ok">✓ Сбор данных — рабочий код-каркас в комплекте</span>
+    <span class="badge b-ok">✓ UI-приложение — предоставляется (нужен порт)</span>
+    <span class="badge b-do">◐ Firebase, деплой и сборка — задача исполнителя</span>
+    <span class="badge b-do">◐ Расширение — каркас готов, собрать</span>
+  </div>
+  <div class="meta">Стек: Firebase (Firestore + Hosting + Functions) + Chrome MV3-расширение. К ТЗ прилагается рабочий код-каркас сбора и текущее приложение (см. §13). Версия ТЗ: 2026-09-14.</div>
+</header>
+
+<div class="toc">
+  <a href="#idea"><b>1</b>Задача</a>
+  <a href="#arch"><b>2</b>Архитектура</a>
+  <a href="#ready"><b>3</b>Что предоставляется готовым</a>
+  <a href="#firebase"><b>4</b>Firebase: что включить</a>
+  <a href="#data"><b>5</b>Модель данных (Firestore)</a>
+  <a href="#ext"><b>6</b>Расширение (MV3)</a>
+  <a href="#fn"><b>7</b>Cloud Function приёма</a>
+  <a href="#acckey"><b>8</b>Ключ аккаунта</a>
+  <a href="#port"><b>9</b>Порт приложения на Firestore</a>
+  <a href="#sec"><b>10</b>Доступы и безопасность</a>
+  <a href="#deploy"><b>11</b>Деплой по шагам</a>
+  <a href="#loop"><b>12</b>Каналы обновления и доступы</a>
+  <a href="#inputs"><b>13</b>Входные материалы</a>
+</div>
+
+<section id="idea">
+  <h2><span class="no">01</span>Задача</h2>
+  <p>Собрать связку из трёх компонентов: <strong>браузерное расширение</strong> (Chrome MV3), <strong>онлайн-база данных + бэкенд</strong> (Firebase) и <strong>веб-приложение</strong> (таблица/карточки, предоставляется готовым — нужен порт на Firebase).</p>
+  <p>Расширение при открытии рекламного аккаунта Facebook (Ads Manager) в профиле AdsPower должно автоматически считывать все связанные объекты аккаунта — бизнес-менеджеры, рекламные кабинеты, страницы, пиксели со всеми полями (статусы, лимиты, траты, даты и т.д.) — и отправлять их в базу, обновляя записи в реальном времени. Расширение ставится по умолчанию во все профили AdsPower; аккаунт обновляется в момент открытия.</p>
+</section>
+
+<section id="arch">
+  <h2><span class="no">02</span>Архитектура</h2>
+<pre class="mermaid">
+flowchart LR
+  A["AdsPower профиль<br/>+ расширение"] -->|"открыт Ads Manager"| B["content script:<br/>снять EAAB-токен<br/>+ Graph API v24"]
+  B -->|"POST инвентарь"| C["Cloud Function<br/>(проверяет секрет)"]
+  C -->|"upsert по FB-id"| D[("Firestore:<br/>аккаунты + ассеты")]
+  D -->|"live onSnapshot"| E["Веб-приложение<br/>(таблица / карточки)"]
+</pre>
+  <ul>
+    <li><strong>Расширение</strong> (в профиле AdsPower) — снимает токен и данные, шлёт на бэкенд.</li>
+    <li><strong>Cloud Function</strong> — единственная точка записи. Проверяет общий секрет, кладёт данные в Firestore. Так ключи Firestore не светятся в расширении и клиент не может писать что попало.</li>
+    <li><strong>Firestore</strong> — база (аккаунты + ассеты). Пишет только функция, читает приложение.</li>
+    <li><strong>Веб-приложение</strong> — готовый UI (таблица/карточки/дашборд аккаунта), предоставляется; читает Firestore вживую.</li>
+  </ul>
+</section>
+
+<section id="ready">
+  <h2><span class="no">03</span>Что предоставляется готовым — не писать заново</h2>
+  <ul>
+    <li><strong>Механизм сбора</strong> (Graph API v24, снятие EAAB-токена, обход рёбер БМ, авто-отбрасывание несуществующих полей) — предоставляется рабочим код-каркасом. Готовые строки полей — в §5.</li>
+    <li><strong>Полный список полей</strong> по каждой сущности (кабинет / БМ / страница / пиксель / аккаунт) — ~90 полей. В §5 и в коде сборщика.</li>
+    <li><strong>UI-приложение</strong> (таблица + виды + карточка-дашборд аккаунта + плоские колонки + роли admin/manager/viewer + лог + аналитика) — предоставляется. Написано <strong>в стиле Firestore</strong> (коллекции/документы/onSnapshot), поэтому переезд = замена «слоя хранилища» (§9), а не переписывание.</li>
+  </ul>
+</section>
+
+<section id="firebase">
+  <h2><span class="no">04</span>Firebase: что включить</h2>
+  <ol>
+    <li>Создать проект Firebase.</li>
+    <li><strong>Firestore Database</strong> (native mode) — хранилище.</li>
+    <li><strong>Authentication</strong> — Email/Password (для команды: админ/менеджер/просмотр). Роль через custom claims или коллекцию <code>users</code>.</li>
+    <li><strong>Cloud Functions</strong> (или 2nd-gen / Cloud Run) — приёмник от расширения.</li>
+    <li><strong>Hosting</strong> — выложить веб-приложение (статический <code>index.html</code>).</li>
+  </ol>
+  <p>Бесплатного тарифа (Spark/Blaze с лимитами) на старте хватает: объёмы маленькие (тысячи аккаунтов × десятки полей).</p>
+</section>
+
+<section id="data">
+  <h2><span class="no">05</span>Модель данных (Firestore)</h2>
+  <p>Структура ровно как в текущем приложении (оно её и ждёт):</p>
+  <table class="tbl">
+    <tr><th>Коллекция</th><th>Документ</th><th>Смысл</th></tr>
+    <tr><td><code>tables/{tid}</code></td><td>описание таблицы: <code>name, order, cols{colId:{name,type,opts,order}}, deleted</code></td><td>Аккаунты, БМы, Лички(кабинеты), ФП, Пиксели…</td></tr>
+    <tr><td><code>tables/{tid}/rows/{rid}</code></td><td>строка: <code>{ c:{colId:val}, o, at, by, uat, uby }</code></td><td>сами данные (1 документ = 1 запись)</td></tr>
+    <tr><td><code>views/{vid}</code></td><td><code>{table, name, order, filters, sort, hidden, colorBy}</code></td><td>виды/фильтры таблиц</td></tr>
+    <tr><td><code>log/{key}</code></td><td><code>{items:[…]}</code></td><td>лог действий (опц.)</td></tr>
+  </table>
+  <p><strong>Детерминированные id — ключ к «обновлению без дублей».</strong> Документы ассетов адресуем по FB-id, а не автогенерацией. Тогда повторный сбор того же аккаунта <em>перезаписывает</em>, а не плодит копии:</p>
+  <ul>
+    <li>аккаунт: <code>tables/t_acc/rows/fb_&lt;fbUserId&gt;</code></li>
+    <li>кабинет: <code>tables/t_ads/rows/aa_&lt;accountId&gt;</code></li>
+    <li>БМ: <code>tables/t_bm/rows/bm_&lt;bmId&gt;</code>, страница: <code>fp_&lt;pageId&gt;</code>, пиксель: <code>px_&lt;pixelId&gt;</code></li>
+    <li>связь с аккаунтом — поле <code>c.c_acc = ["fb_&lt;fbUserId&gt;"]</code> (тип link на таблицу Аккаунты).</li>
+  </ul>
+  <h3>Поля, которые тянет сбор (готовые строки Graph API v24)</h3>
+  <p>Точные наборы полей (лишнее авто-отбрасывается на лету):</p>
+  <div class="codewrap"><div class="cap">поля Graph API по сущностям</div>
+  <textarea class="code" rows="14" readonly>
+me (аккаунт/VIA):
+  id,name,first_name,last_name,picture{url,width,height},link,friends.summary(true)
+
+ad account (кабинет / личка):
+  id,account_id,name,business{id,name},account_status,disable_reason,currency,
+  amount_spent,spend_cap,balance,adtrust_dsl,created_time,age,timezone_name,
+  is_prepay_account,funding_source_details{id,display_string,type},user_tasks,
+  min_daily_budget,min_campaign_group_spend_cap,is_personal,business_name,
+  business_country_code,business_city,business_state,business_zip,business_street,
+  business_street2,opportunity_score
+  // ВАЖНО: суммы (amount_spent/spend_cap/balance/min_*) — в ЦЕНТАХ (÷100).
+  //        adtrust_dsl (спенд-лимит аккаунта) — уже в ДОЛЛАРАХ.
+  //        account_status/disable_reason — числовые коды (мэппинг в коде).
+
+business (БМ):
+  id,name,verification_status,two_factor_type,created_time,updated_time,
+  primary_page{id,name},is_hidden,link,profile_picture_uri
+  + рёбра: /{id}/owned_ad_accounts, /client_ad_accounts, /owned_pages,
+    /client_pages, /adspixels, /owned_data_sources, /client_data_sources,
+    /owned_businesses, /business_users
+
+page (ФП):
+  id,name,username,link,category,category_list{id,name},tasks,is_published,
+  verification_status,fan_count,followers_count,talking_about_count,created_time,
+  picture{url,width,height},cover{source,id},engagement{count,social_sentence},
+  business{id,name},about,description,general_info,website,phone,
+  location{city,country,street,zip,latitude,longitude},single_line_address,
+  connected_instagram_account{id,username},instagram_business_account{id,username}
+
+pixel (Пиксель / dataset):
+  id,name,last_fired_time,creation_time,is_unavailable,owner_business{id,name},
+  owner_ad_account{id,name},data_use_setting,enable_automatic_matching,
+  automatic_matching_fields,first_party_cookie_status,is_created_by_business,
+  has_1p_pixel_event,is_crm,code,description,usage,event_stats,event_time_min,
+  event_time_max,valid_entries,matched_entries,duplicate_entries,match_rate_approx
+  </textarea></div>
+  <p>Русские названия колонок + типы для каждого поля приложены отдельным планом (JSON — см. §13).</p>
+</section>
+
+<section id="ext">
+  <h2><span class="no">06</span>Расширение (MV3)</h2>
+  <p>Content-script на страницах Ads Manager / Business Suite. Снимает токен из HTML (логика — в приложенном код-каркасе), бьёт Graph API с <code>host_permissions</code>, шлёт результат на Cloud Function. Firestore-ключи в расширении <strong>не хранятся</strong>.</p>
+  <div class="codewrap"><div class="cap">manifest.json</div>
+  <textarea class="code" rows="20" readonly>
+{
+  "manifest_version": 3,
+  "name": "Ad Inventory Sync",
+  "version": "1.0.0",
+  "description": "Автосбор FB-инвентаря в базу при открытии Ads Manager",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://*.facebook.com/*",
+    "https://graph.facebook.com/*",
+    "https://<ПРОЕКТ>.cloudfunctions.net/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/adsmanager/*",
+        "https://business.facebook.com/*"
+      ],
+      "js": ["collect.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
+  </textarea></div>
+  <div class="codewrap"><div class="cap">collect.js — логика сбора (порт рабочего сборщика) + отправка</div>
+  <textarea class="code" rows="30" readonly>
+// Один прогон на загрузку вкладки; не чаще раза в час на аккаунт.
+const ENDPOINT = "https://<ПРОЕКТ>.cloudfunctions.net/ingest";
+const SHARED_SECRET = "<ОБЩИЙ-СЕКРЕТ>"; // проверяется функцией
+const G = "https://graph.facebook.com/v24.0/";
+
+const splitTop = s => { const o=[]; let d=0,c=""; for (const ch of s){
+  if(ch==="{")d++; else if(ch==="}")d--; if(ch===","&&d===0){o.push(c);c="";} else c+=ch; }
+  if(c)o.push(c); return o; };
+const stripField = (f,bad) => splitTop(f).filter(p=>p.split("{")[0].trim()!==bad).join(",");
+
+async function g(path, params){
+  try{ const r=await fetch(G+path+"?"+params,{credentials:"include"}); return await r.json(); }
+  catch(e){ return {error:{message:String(e)}}; }
+}
+// GET с авто-отбрасыванием несуществующих в v24 полей (одно «плохое» поле не рушит запрос)
+async function gf(tok, path, fields, extra){
+  let f=fields;
+  for(let i=0;i<20;i++){
+    const j=await g(path, "access_token="+tok+"&fields="+encodeURIComponent(f)+(extra?("&"+extra):""));
+    const m=(j&&j.error&&j.error.message||"").match(/nonexisting field \(([^)]+)\)/);
+    if(m){ const nf=stripField(f,m[1]); if(nf===f||!nf) return j; f=nf; continue; }
+    return j;
+  }
+  return {data:[]};
+}
+async function paged(tok, path, fields){
+  let out=[],guard=0,j=await gf(tok,path,fields,"limit=100");
+  while(j&&j.data){ out=out.concat(j.data); if(!j.paging||!j.paging.next||++guard>25) break;
+    try{ j=await (await fetch(j.paging.next,{credentials:"include"})).json(); }catch(e){ break; } }
+  return out;
+}
+function grabToken(){
+  const set=new Set(); const re=/EAA[A-Za-z0-9]{30,}/g; let m;
+  while((m=re.exec(document.documentElement.innerHTML))) set.add(m[0]);
+  const rank=t=>t.startsWith("EAAB")?3:t.startsWith("EAAG")?2:t.startsWith("EAAI")?1:0;
+  return [...set].sort((a,b)=>(rank(b)-rank(a))||(b.length-a.length))[0]||"";
+}
+
+const AA="id,account_id,name,business{id,name},account_status,disable_reason,currency,amount_spent,spend_cap,balance,adtrust_dsl,created_time,age,timezone_name,is_prepay_account,funding_source_details{id,display_string,type},user_tasks,min_daily_budget,min_campaign_group_spend_cap,is_personal,business_name,business_country_code,business_city,business_state,business_zip,business_street,business_street2,opportunity_score";
+const BM="id,name,verification_status,two_factor_type,created_time,updated_time,primary_page{id,name},is_hidden,link,profile_picture_uri";
+const PG="id,name,username,link,category,category_list{id,name},tasks,is_published,verification_status,fan_count,followers_count,talking_about_count,created_time,picture{url,width,height},cover{source,id},engagement{count,social_sentence},business{id,name},about,description,general_info,website,phone,location{city,country,street,zip,latitude,longitude},single_line_address,connected_instagram_account{id,username},instagram_business_account{id,username}";
+const PX="id,name,last_fired_time,creation_time,is_unavailable,owner_business{id,name},owner_ad_account{id,name},data_use_setting,enable_automatic_matching,automatic_matching_fields,first_party_cookie_status,is_created_by_business,has_1p_pixel_event,is_crm,code,description,usage,event_stats,event_time_min,event_time_max,valid_entries,matched_entries,duplicate_entries,match_rate_approx";
+
+async function collect(){
+  const tok=grabToken(); if(!tok) return null;
+  const me=await gf(tok,"me","id,name,first_name,last_name,picture{url,width,height},link,friends.summary(true)");
+  if(me.error) return null;
+  const out={user:me, friends:(me.friends&&me.friends.summary||{}).total_count??null,
+             businesses:[], ad_accounts:[], pages:[], pixels:[]};
+  const seenA=new Set(),seenP=new Set(),seenX=new Set();
+  const pushA=(a,bm,cl)=>{const id=String(a.account_id||a.id||""); if(id&&!seenA.has(id)){seenA.add(id);
+    out.ad_accounts.push(Object.assign({},a,{id,bm:bm||"",client:!!cl}));}};
+  const pushP=(p,bm)=>{if(p&&p.id&&!seenP.has(p.id)){seenP.add(p.id); out.pages.push(Object.assign({},p,{bm:bm||""}));}};
+  const pushX=(x,bm)=>{if(x&&x.id&&!seenX.has(x.id)){seenX.add(x.id); out.pixels.push(Object.assign({},x,{bm:bm||""}));}};
+  for(const bm of await paged(tok,"me/businesses",BM)){
+    out.businesses.push(bm);
+    for(const a of await paged(tok,bm.id+"/owned_ad_accounts",AA)) pushA(a,bm.id,false);
+    for(const a of await paged(tok,bm.id+"/client_ad_accounts",AA)) pushA(a,bm.id,true);
+    for(const p of await paged(tok,bm.id+"/owned_pages",PG)) pushP(p,bm.id);
+    for(const p of await paged(tok,bm.id+"/client_pages",PG)) pushP(p,bm.id);
+    for(const e of ["adspixels","owned_data_sources","client_data_sources"])
+      for(const x of await paged(tok,bm.id+"/"+e,PX)) pushX(x,bm.id);
+    bm.child_businesses=await paged(tok,bm.id+"/owned_businesses","id,name,verification_status");
+    bm.users=await paged(tok,bm.id+"/business_users","id,name,email,role");
+  }
+  for(const a of await paged(tok,"me/adaccounts",AA)) pushA(a,"",false);
+  for(const p of await paged(tok,"me/accounts",PG)) pushP(p,"");
+  return out;
+}
+
+// не долбить чаще раза в час на один FB-аккаунт
+async function throttled(fbid){
+  const k="lastsync_"+fbid, now=Date.now();
+  const st=await chrome.storage.local.get(k);
+  if(st[k]&&now-st[k]<3600e3) return false;
+  await chrome.storage.local.set({[k]:now}); return true;
+}
+
+(async ()=>{
+  try{
+    const inv=await collect(); if(!inv||!inv.user) return;
+    if(!await throttled(inv.user.id)) return;
+    await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({secret:SHARED_SECRET, inv})});
+  }catch(e){ /* тихо: сбор best-effort */ }
+})();
+  </textarea></div>
+  <div class="callout warn">
+    <div class="t">Проверить на реальном профиле</div>
+    Content-script читает токен из HTML и бьёт graph.facebook.com. В большинстве профилей это работает из isolated world (есть host_permissions). Если в каком-то раскладе токен не виден из isolated world — переключить content-script в <code>"world":"MAIN"</code> (MV3 это умеет) или инжектить &lt;script&gt;. Первый прогон разобрать по факту.
+  </div>
+</section>
+
+<section id="fn">
+  <h2><span class="no">07</span>Cloud Function приёма (upsert без дублей)</h2>
+  <p>Единственная точка записи в Firestore. Проверяет секрет, раскладывает инвентарь по документам с детерминированными id (§5), конвертирует центы/коды в человеческий вид. Полная логика раскладки/мэппинга приложена (Python-референс + JS — см. §13), тут скелет:</p>
+  <div class="codewrap"><div class="cap">functions/index.js — скелет</div>
+  <textarea class="code" rows="24" readonly>
+const {onRequest} = require("firebase-functions/v2/https");
+const {initializeApp} = require("firebase-admin/app");
+const {getFirestore, FieldValue} = require("firebase-admin/firestore");
+initializeApp();
+const db = getFirestore();
+const SECRET = process.env.SYNC_SECRET;
+
+const NOW = () => new Date().toISOString();
+const money = v => { const n=Number(v); return Number.isFinite(n)?(n/100).toFixed(2):""; };
+const STATUS = {1:"активна",2:"отключена",3:"не оплачен",7:"на проверке риска",8:"ожидает оплаты",9:"грейс-период",100:"ожидает закрытия",101:"закрыта"};
+
+exports.ingest = onRequest(async (req, res) => {
+  if (req.method !== "POST" || (req.body||{}).secret !== SECRET) return res.status(403).end();
+  const inv = req.body.inv; const u = inv.user; if (!u || !u.id) return res.status(400).end();
+  const acc = "fb_" + u.id;
+  const batch = db.batch();
+
+  // аккаунт (мержим, чтобы не затирать созданные вручную поля/креды)
+  batch.set(db.doc(`tables/t_acc/rows/${acc}`), {
+    c: { c_fbid:String(u.id), c_fbname:u.name||"", c_via_first:u.first_name||"",
+         c_via_last:u.last_name||"", c_via_link:u.link||"",
+         c_via_avatar:((u.picture||{}).data||{}).url||"", c_friends:inv.friends??null,
+         c_counts:`БМ ${inv.businesses.length} · РК ${inv.ad_accounts.length} · ФП ${inv.pages.length} · PX ${inv.pixels.length}`,
+         c_collected: NOW().slice(0,10) },
+    uat: NOW(), uby: "авто-синк"
+  }, {merge:true});
+
+  // кабинеты (пример поля лимита adtrust_dsl -> «Лимит РК»)
+  for (const a of inv.ad_accounts) {
+    batch.set(db.doc(`tables/t_ads/rows/aa_${a.account_id||a.id}`), {
+      c: { c_account_id:String(a.account_id||a.id), c_name:a.name||"",
+           c_account_status: STATUS[a.account_status]||"", c_currency:a.currency||"",
+           c_amount_spent: money(a.amount_spent), c_balance: money(a.balance),
+           c_spend_limit: a.adtrust_dsl!=null?String(Number(a.adtrust_dsl).toFixed(2)):"",
+           c_bm:String(a.bm||""), c_acc:[acc] },
+      uat: NOW(), uby: "авто-синк"
+    }, {merge:true});
+  }
+  // ... аналогично t_bm / t_fp / t_pixel (полный маппинг приложен, §13)
+
+  await batch.commit();
+  res.json({ok:true, counts:{bm:inv.businesses.length, aa:inv.ad_accounts.length, fp:inv.pages.length, px:inv.pixels.length}});
+});
+  </textarea></div>
+  <p><code>{merge:true}</code> важен: авто-синк не должен затирать поля, которые пользователи заполняют вручную (логины/пароли, заметки и прочие ручные поля).</p>
+</section>
+
+<section id="acckey">
+  <h2><span class="no">08</span>Ключ аккаунта</h2>
+  <p>Из Graph API расширение получает <strong>FB-id</strong> аккаунта — это стабильный ключ. Все документы (аккаунт и его ассеты) адресуются по FB-id (§5), поэтому повторный сбор того же аккаунта <strong>перезаписывает</strong> записи, а не плодит дубли. Имя профиля AdsPower на странице Facebook недоступно; если оно нужно как подпись — проставляется отдельным сопоставлением по FB-id (не входит в основной контур, код связки приложен — §13).</p>
+</section>
+
+<section id="port">
+  <h2><span class="no">09</span>Порт приложения на Firestore</h2>
+  <p>Текущий прототип приложения — один <code>index.html</code>, размещённый как Claude Artifact и использующий его встроенное хранилище. Оно берётся так: <code>const db = await claude.use('db')</code> и дальше <code>db.collection(...)</code>, <code>db.doc(...)</code>, <code>.get/.set/.update/.onSnapshot</code>, <code>.where/.orderBy/.limit</code>. Это <strong>тот же интерфейс, что у Firestore</strong>. Нужен тонкий адаптер: заменить получение <code>db</code> на Firestore SDK. Остальной код (таблица/виды/карточка/дашборд/роли) не трогаем.</p>
+  <div class="codewrap"><div class="cap">index.html — заменить блок инициализации хранилища</div>
+  <textarea class="code" rows="22" readonly>
+&lt;script type="module"&gt;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc,
+  deleteDoc, onSnapshot, query, where, orderBy, limit }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const app = initializeApp({ /* firebaseConfig из консоли */ });
+const fs = getFirestore(app);
+
+// адаптер под интерфейс, который ждёт приложение:
+window.__DB__ = {
+  collection: (path) => {
+    const ref = collection(fs, path);
+    return {
+      onSnapshot: (cb, err) => onSnapshot(ref, s => cb({docs:
+        s.docs.map(d => ({id:d.id, exists:true, data:()=>d.data()}))}), err),
+      add: async (data) => { const r = doc(ref); await setDoc(r,data); return {id:r.id}; },
+      get: async () => { const s=await getDocs(ref); return {docs:
+        s.docs.map(d=>({id:d.id, exists:true, data:()=>d.data()}))}; },
+    };
+  },
+  doc: (path) => { const r = doc(fs, path); return {
+    get: async () => { const s=await getDoc(r); return {exists:s.exists(), data:()=>s.data()}; },
+    set: (data) => setDoc(r, data, {merge:false}),
+    update: (data) => updateDoc(r, data),
+    delete: () => deleteDoc(r),
+  };},
+};
+&lt;/script&gt;
+  </textarea></div>
+  <p>Затем в коде приложения: вместо <code>db = await claude.use('db')</code> написать <code>db = window.__DB__</code>. Пара мест потребует внимания:</p>
+  <ul>
+    <li><strong>update с вложенным <code>c</code>.</strong> Приложение зовёт <code>update({c:{[colId]:val}})</code> и рассчитывает, что мержится ТОЛЬКО одно поле внутри <code>c</code>. В Firestore это затрёт весь <code>c</code> — использовать точечный путь: <code>updateDoc(r, {[`c.${colId}`]: val, uat, uby})</code>. (В адаптере можно распознавать такой вызов и превращать в dot-path.)</li>
+    <li><strong>Роли.</strong> Сейчас роль определяется чтением спец-документов (adminzone/managerzone). На Firebase — через Firebase Auth (custom claim <code>role</code>) либо коллекцию <code>users/{uid}={role}</code>. Заменить функцию определения роли.</li>
+    <li><strong>Скачивание CSV</strong> — сейчас через среду текущего прототипа; на вебе заменить на обычный <code>Blob</code>+<code>&lt;a download&gt;</code> (тривиально).</li>
+  </ul>
+  <p>Полный <code>index.html</code> приложен (§13) — останется вставить адаптер и firebaseConfig.</p>
+</section>
+
+<section id="sec">
+  <h2><span class="no">10</span>Доступы и безопасность</h2>
+  <div class="callout warn">
+    <div class="t">В базе — пароли и 2FA открытым текстом</div>
+    В аккаунтах хранятся логины, пароли FB/почты, 2FA, recovery. Это чувствительно. База должна быть закрыта только для команды и только по HTTPS.
+  </div>
+  <ul>
+    <li><strong>Firestore rules:</strong> чтение/запись — только аутентифицированным (команда). Клиентскую запись максимально закрыть: данные пишет только Cloud Function (admin SDK, мимо правил). Приложению дать write на пользовательские правки (по роли), но не «всё подряд».</li>
+    <li><strong>Расширение</strong> не содержит ключей Firestore — только URL функции и общий секрет; шлёт лишь FB-данные ассетов (не креды).</li>
+    <li><strong>Роли:</strong> admin (всё + аналитика + переименование), manager (правит данные, лимит удалений, без аналитики), viewer (только чтение) — логика ролей в приложении уже есть, привязать к Firebase Auth.</li>
+    <li>Секрет функции — в переменных окружения (<code>SYNC_SECRET</code>), не в репозитории.</li>
+  </ul>
+  <div class="codewrap"><div class="cap">firestore.rules — старт</div>
+  <textarea class="code" rows="12" readonly>
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function signedIn() { return request.auth != null; }
+    function role() { return request.auth.token.role; }
+    match /{document=**} {
+      allow read: if signedIn();               // команда видит всё
+      allow write: if signedIn() && role() in ['admin','manager']; // ручные правки
+      // массовый импорт от расширения идёт через Cloud Function (admin SDK), мимо этих правил
+    }
+  }
+}
+  </textarea></div>
+</section>
+
+<section id="deploy">
+  <h2><span class="no">11</span>Деплой по шагам</h2>
+  <ol class="steps">
+    <li>Создать Firebase-проект; включить Firestore, Auth (Email/Password), Functions, Hosting.</li>
+    <li>Завести пользователей команды в Auth, проставить роли (custom claims <code>admin/manager/viewer</code>).</li>
+    <li><code>firebase init</code> (firestore, functions, hosting). Выложить <code>firestore.rules</code>.</li>
+    <li>Вставить в приложение адаптер (§9) + firebaseConfig → <code>firebase deploy --only hosting</code>.</li>
+    <li>Задать <code>SYNC_SECRET</code>, задеплоить функцию <code>ingest</code> (§7) → <code>firebase deploy --only functions</code>.</li>
+    <li>Собрать расширение (§6): подставить URL функции и секрет. Протестировать на одном профиле, глянуть, что данные долетели в Firestore.</li>
+    <li>Добавить расширение в AdsPower как расширение по умолчанию для всех профилей.</li>
+  </ol>
+</section>
+
+<section id="loop">
+  <h2><span class="no">12</span>Каналы обновления и доступы (настроить один раз)</h2>
+  <p>Firebase поднимается один раз; дальше деплой инкрементальный. Нужно обеспечить <strong>два независимых канала</strong> обновления:</p>
+  <h3>A. Данные и структура таблиц — без деплоя</h3>
+  <p>Изменения данных и колонок — это записи в <strong>Firestore</strong>, не в код. Должны быть возможны тремя путями, ни один не требует выкладки:</p>
+  <ul>
+    <li>пользователями прямо в приложении (по ролям);</li>
+    <li>расширением (авто-сбор при открытии аккаунта);</li>
+    <li>служебным скриптом (Node/Python) со <em>service-account</em>-ключом Firebase — запись в Firestore напрямую.</li>
+  </ul>
+  <h3>B. Код приложения (index.html) — быстрый деплой</h3>
+  <p>Изменения кода приложения требуют выкладки. Настроить один из способов быстрого деплоя (без ручной пересборки проекта каждый раз):</p>
+  <ul>
+    <li><strong>CLI-токен:</strong> <code>firebase login:ci</code> → правка <code>index.html</code> и деплой одной командой <code>firebase deploy --only hosting</code>;</li>
+    <li><strong>Git-автодеплой:</strong> репозиторий + GitHub Action (Firebase Hosting) с секретом service-account → <code>push</code> в <code>main</code> выкладывается автоматически.</li>
+  </ul>
+  <div class="callout">
+    <div class="t">Итог по доступам</div>
+    Предоставить: доступ на деплой (CLI-токен <em>или</em> репозиторий с автодеплоем) и service-account-ключ для записи в Firestore из служебных скриптов. После этого обновление данных идёт без деплоя, а обновление кода — одной командой/пушем.
+  </div>
+</section>
+
+<section id="inputs">
+  <h2><span class="no">13</span>Входные материалы (приложены к ТЗ)</h2>
+  <p>Вместе с этим ТЗ передаются готовые артефакты:</p>
+  <ul>
+    <li>полный текущий <code>index.html</code> приложения (UI целиком);</li>
+    <li>JSON-план всех колонок: <code>colId → русское имя, тип, из какого Graph-поля, формат</code> (кабинет/БМ/страница/пиксель/аккаунт);</li>
+    <li>полный маппинг для Cloud Function (центы→доллары, коды статусов/причин, сводки БМ, даты, пиксель-метрики) — рабочий Python-референс для портирования на JS;</li>
+    <li><code>collect.js</code> расширения (выше — рабочий каркас, доведу под финальный домен функции);</li>
+    <li>код связки AdsPower uid ↔ FB-id (опционально — чтобы подписывать аккаунт именем профиля).</li>
+  </ul>
+  <p>Исполнителю остаётся: поднять Firebase, вставить конфиги/секрет, задеплоить, собрать расширение и раздать его в AdsPower. Архитектура и весь прикладной код — в этом документе и приложениях.</p>
+</section>
+
+<hr>
+<div class="foot">Realtime-синхронизация FB-инвентаря · техническое задание · v1</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+  (function(){
+    const dark = matchMedia('(prefers-color-scheme:dark)').matches && !document.documentElement.getAttribute('data-theme') || document.documentElement.getAttribute('data-theme')==='dark';
+    try{ mermaid.initialize({startOnLoad:true, theme: dark?'dark':'neutral', securityLevel:'loose'}); }catch(e){}
+    // авто-высота textarea-кода
+    document.querySelectorAll('textarea.code').forEach(t=>{
+      const fit=()=>{ t.style.height='auto'; t.style.height=(t.scrollHeight+4)+'px'; };
+      fit(); t.addEventListener('input',fit);
+    });
+  })();
+</script>

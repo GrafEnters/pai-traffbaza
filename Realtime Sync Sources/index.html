@@ -1,0 +1,1481 @@
+<title>Traffbraza База</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600&display=swap">
+<style>
+:root{
+  --bg:#F6F6F9; --surface:#FFFFFF; --surface2:#EFEFF5; --line:#E2E2EC;
+  --ink:#1D1E2C; --muted:#6E7087; --accent:#5850C7; --accent-ink:#FFFFFF;
+  --accent-soft:#EDECFA; --shadow:0 10px 30px rgba(29,30,44,.14);
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ui:'Manrope','Segoe UI',system-ui,-apple-system,sans-serif;
+  --disp:'Unbounded','Manrope',sans-serif;
+  --c-green:#1F8F45; --cs-green:#E3F4E8; --c-red:#C43A3A; --cs-red:#FBE9E9;
+  --c-blue:#2563B0; --cs-blue:#E5EFFB; --c-purple:#6D4FC0; --cs-purple:#EFEAFB;
+  --c-yellow:#8F6E0C; --cs-yellow:#FBF2D4; --c-orange:#B05B14; --cs-orange:#FBEBDD;
+  --c-teal:#0E7E77; --cs-teal:#DDF2F0; --c-gray:#6B6D80; --cs-gray:#ECECF2;
+  --c-pink:#B03A7E; --cs-pink:#FAE7F2;
+}
+:root:not([data-theme="light"]){ color-scheme:light dark; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131420; --surface:#1B1C2B; --surface2:#232435; --line:#2E2F44;
+    --ink:#E9E9F2; --muted:#9698B0; --accent:#8A83E8; --accent-ink:#14151F;
+    --accent-soft:#2A2947; --shadow:0 10px 30px rgba(0,0,0,.5);
+    --c-green:#4CC07A; --cs-green:#1C3226; --c-red:#E4726F; --cs-red:#3A2224;
+    --c-blue:#6FA6E8; --cs-blue:#1F2C40; --c-purple:#A78FE8; --cs-purple:#2B2440;
+    --c-yellow:#D9C04F; --cs-yellow:#34301A; --c-orange:#E0954F; --cs-orange:#382718;
+    --c-teal:#4FC0B5; --cs-teal:#173230; --c-gray:#9B9DB2; --cs-gray:#282936;
+    --c-pink:#E07FB6; --cs-pink:#3A2231;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131420; --surface:#1B1C2B; --surface2:#232435; --line:#2E2F44;
+  --ink:#E9E9F2; --muted:#9698B0; --accent:#8A83E8; --accent-ink:#14151F;
+  --accent-soft:#2A2947; --shadow:0 10px 30px rgba(0,0,0,.5);
+  --c-green:#4CC07A; --cs-green:#1C3226; --c-red:#E4726F; --cs-red:#3A2224;
+  --c-blue:#6FA6E8; --cs-blue:#1F2C40; --c-purple:#A78FE8; --cs-purple:#2B2440;
+  --c-yellow:#D9C04F; --cs-yellow:#34301A; --c-orange:#E0954F; --cs-orange:#382718;
+  --c-teal:#4FC0B5; --cs-teal:#173230; --c-gray:#9B9DB2; --cs-gray:#282936;
+  --c-pink:#E07FB6; --cs-pink:#3A2231;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:13.5px;line-height:1.4;overflow:hidden}
+button{font-family:var(--ui);cursor:pointer;color:inherit}
+input,select,textarea{font-family:var(--ui);color:var(--ink);font-size:13px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+.app{display:grid;grid-template-columns:230px 1fr;height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side-top{padding:16px 14px 8px}
+.brand{font-family:var(--disp);font-size:15px}
+.brand em{font-style:normal;color:var(--accent)}
+.whoami{display:flex;gap:6px;margin-top:10px}
+.badge{display:inline-block;border-radius:6px;padding:2px 9px;font-size:11.5px;font-weight:800;white-space:nowrap}
+.b-ok{background:var(--cs-green);color:var(--c-green)}
+.b-bad{background:var(--cs-red);color:var(--c-red)}
+.b-warn{background:var(--cs-yellow);color:var(--c-yellow)}
+.b-info{background:var(--cs-blue);color:var(--c-blue)}
+.b-ghost{background:var(--cs-gray);color:var(--c-gray)}
+.b-acc{background:var(--accent-soft);color:var(--accent)}
+.src-note{font-size:11px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 15px}
+.tile .n{font-family:var(--disp);font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .l{color:var(--muted);font-size:11.5px;margin-top:4px;font-weight:600}
+.tile.ok .n{color:var(--c-green)}
+.tile.bad .n{color:var(--c-red)}
+.gsearch{margin:10px 14px 4px;position:relative}
+.gsearch input{width:100%;padding:7px 10px 7px 28px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:12.5px}
+.gsearch .ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+.side-scroll{flex:1;overflow-y:auto;padding:6px 8px 8px;min-height:0}
+.side-h{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:10px 8px 4px;display:flex;align-items:center}
+.side-h button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:14px;border-radius:6px;padding:0 5px}
+.side-h button:hover{color:var(--accent);background:var(--accent-soft)}
+.titem{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px}
+.titem:hover{background:var(--surface2)}
+.titem.on{background:var(--accent-soft);color:var(--accent)}
+.titem .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--muted);font-weight:400}
+.vitem{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 26px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600}
+.vitem:hover{background:var(--surface2)}
+.vitem.on{color:var(--accent)}
+.vitem .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+.vadd{padding:3px 8px 6px 26px;font-size:11.5px;color:var(--muted);cursor:pointer;border:0;background:none;display:block}
+.vadd:hover{color:var(--accent)}
+.side-foot{border-top:1px solid var(--line);padding:10px 14px;font-size:11px;color:var(--muted);line-height:1.5}
+.dbdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c-gray);margin-right:5px}
+.dbdot.on{background:var(--c-green)}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.tb{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.tb .tname{font-weight:800;font-size:15px;cursor:text;padding:2px 6px;border-radius:6px}
+.tb .tname:hover{background:var(--surface2)}
+.tb .vname{color:var(--muted);font-weight:700;font-size:13px;cursor:text;padding:2px 6px;border-radius:6px}
+.tb .vname:hover{background:var(--surface2)}
+.tbtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tb .sp{flex:1}
+.rocount{font-size:12px;color:var(--muted);white-space:nowrap}
+
+.gridwrap{flex:1;overflow:auto;min-height:0;position:relative}
+table.grid{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.grid th{position:sticky;top:0;background:var(--surface2);border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;z-index:3;font-weight:700;font-size:12px;color:var(--muted);text-align:left;white-space:nowrap}
+.grid th .hd{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;min-width:110px}
+.grid th .hd:hover{background:var(--accent-soft)}
+.grid th .ty{font-size:10px;opacity:.7}
+.grid th.addcol{min-width:44px;text-align:center;cursor:pointer;font-size:16px;color:var(--muted)}
+.grid th.addcol:hover{color:var(--accent);background:var(--accent-soft)}
+.grid td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;vertical-align:middle;background:var(--surface);max-width:340px}
+.grid td .cell{padding:7px 10px;min-height:32px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid td .cell:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.grid td.rownum{background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:10.5px;text-align:right;padding:7px 8px;min-width:46px;position:sticky;left:0;z-index:2;cursor:pointer}
+.grid td.rownum:hover{color:var(--accent)}
+.grid td.rownum .open{display:none;font-size:12px}
+.grid tr:hover td.rownum .num{display:none}
+.grid tr:hover td.rownum .open{display:inline}
+.grid tr.addrow td{cursor:pointer;color:var(--muted);background:var(--surface)}
+.grid tr.addrow td:hover{color:var(--accent);background:var(--accent-soft)}
+.pill{display:inline-block;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.linkchip{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:700;margin-right:4px;white-space:nowrap}
+.mono{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.dim{color:var(--muted)}
+.checkmark{font-size:14px;color:var(--c-green);font-weight:700}
+
+.pop{position:fixed;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);z-index:70;min-width:220px;max-width:380px;max-height:65vh;overflow-y:auto}
+.pop .sec{padding:10px 12px;border-bottom:1px solid var(--line)}
+.pop .sec:last-child{border-bottom:0}
+.pop label{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:5px}
+.pop input[type=text],.pop input[type=number],.pop input[type=date],.pop select,.pop textarea{width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:7px 9px}
+.pop textarea{min-height:90px;resize:vertical}
+.mrow{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;text-align:left;padding:7px 12px;font-size:13px;font-weight:600}
+.mrow:hover{background:var(--surface2)}
+.mrow.danger{color:var(--c-red)}
+.mrow .k{margin-left:auto;font-size:11px;color:var(--muted)}
+.optrow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.optrow input{flex:1}
+.swatch{width:22px;height:22px;border-radius:6px;border:2px solid transparent;cursor:pointer;flex:none}
+.swatch.on{border-color:var(--ink)}
+.selopt{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;text-align:left;padding:6px 12px}
+.selopt:hover{background:var(--surface2)}
+.btn{border:0;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:13px;padding:8px 14px}
+.btn.ghost{background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.btn.danger{background:var(--c-red);color:#fff}
+.btnrow{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45}
+.frow{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.frow select,.frow input{flex:1;min-width:80px}
+.chip-x{border:0;background:var(--surface2);border-radius:6px;font-size:11px;padding:2px 7px;color:var(--muted)}
+.chip-x:hover{color:var(--c-red)}
+
+.veil{position:fixed;inset:0;background:rgba(15,16,28,.45);z-index:60}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,94vw);background:var(--surface);border-left:1px solid var(--line);z-index:61;overflow-y:auto;box-shadow:var(--shadow);padding:20px 22px 40px}
+.drawer .close{position:absolute;top:12px;right:14px;border:0;background:var(--surface2);border-radius:8px;width:30px;height:30px;font-size:15px;color:var(--muted)}
+.dr-kind{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.dr-name{font-family:var(--disp);font-size:19px;margin:4px 0 14px;word-break:break-word}
+.fld{margin-bottom:12px}
+.fld .fl{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:3px}
+.fld .fv{padding:6px 9px;border:1px solid transparent;border-radius:7px;cursor:pointer;min-height:30px;word-break:break-word}
+.fld .fv:hover{border-color:var(--accent)}
+.sect{margin:18px 0 0}
+.sect h3{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.relrow{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;cursor:pointer}
+.relrow:hover{border-color:var(--accent)}
+.ev{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.ev:last-child{border-bottom:0}
+.ev .d{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;padding-top:2px}
+.ev .who{color:var(--accent);font-weight:800}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 18px;font-weight:700;font-size:13px;z-index:99;box-shadow:var(--shadow)}
+.logscreen{flex:1;overflow-y:auto;padding:18px 22px}
+.logscreen h1{font-size:17px;margin:0 0 4px}
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start}
+.an-panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.an-panel h3{margin:0 0 12px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.assetcard{border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:8px;cursor:pointer;display:grid;gap:2px}
+.assetcard:hover{border-color:var(--accent)}
+.kv{display:flex;gap:8px;font-size:12px;line-height:1.5}
+.kv .kvk{color:var(--muted);flex:0 0 148px;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;font-weight:800;padding-top:1px}
+.kv .kvv{word-break:break-word;min-width:0}
+.blrow{display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:12.5px}
+.blrow .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.blrow .track{background:var(--surface2);border-radius:5px;height:14px;overflow:hidden}
+.blrow .fill{height:100%;border-radius:4px;min-width:2px}
+.blrow .val{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink)}
+.an-svg{width:100%;height:auto;display:block}
+.banner{background:var(--accent-soft);color:var(--accent);padding:8px 16px;font-size:12.5px;font-weight:700}
+.loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-weight:700;gap:10px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.mini{border:1px solid var(--line);background:var(--surface2);border-radius:7px;padding:3px 9px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.mini:hover{color:var(--accent);border-color:var(--accent)}
+.col-rs{position:absolute;right:-4px;top:0;bottom:0;width:8px;cursor:col-resize;z-index:5}
+.col-rs:hover{background:var(--accent-soft)}
+.gs-drop{position:absolute;top:calc(100% + 5px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);max-height:330px;overflow-y:auto;z-index:80}
+.gs-hit{padding:7px 10px;cursor:pointer;border-bottom:1px solid var(--line);font-size:12.5px}
+.gs-hit:hover{background:var(--surface2)}
+.gs-hit .t{color:var(--muted);font-size:10.5px}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .side{flex-direction:column;max-height:44vh;border-right:0;border-bottom:1px solid var(--line)}
+}
+</style>
+
+<div class="app">
+  <nav class="side">
+    <div class="side-top">
+      <div class="brand">traff<em>braza</em> <span class="dim" style="font-size:11px;font-weight:400">база · v2</span></div>
+      <div class="whoami" id="whoami"></div>
+      <div class="gsearch"><span class="ic">⌕</span><input id="gs" placeholder="Поиск по всей базе…" autocomplete="off"><div class="gs-drop" id="gsdrop" hidden></div></div>
+    </div>
+    <div class="side-scroll" id="sidelist"></div>
+    <div class="side-foot" id="dbfoot"><span class="dbdot"></span>подключаюсь…</div>
+  </nav>
+  <main class="main" id="main"><div class="loading">Загружаю базу…</div></main>
+</div>
+<div id="poplayer"></div>
+<div id="overlay" hidden></div>
+
+<script>
+'use strict';
+/* ============ утилиты ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const debounce=(f,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>f(...a),ms)}};
+function toast(m,action){
+  const t=el(`<div class="toast">${esc(m)}${action?` <button style="border:0;background:var(--accent);color:var(--accent-ink);border-radius:7px;padding:3px 10px;margin-left:8px;font-weight:800;cursor:pointer">${esc(action.label)}</button>`:''}</div>`);
+  if(action)t.querySelector('button').addEventListener('click',()=>{t.remove();action.fn();});
+  document.body.appendChild(t);setTimeout(()=>t.remove(),action?8000:2600);
+}
+const COLORS=['green','red','blue','purple','yellow','orange','teal','gray','pink'];
+const safeColor=c=>COLORS.includes(c)?c:'gray';
+const TYPE_LABELS={text:'Текст',longtext:'Длинный текст',number:'Число',checkbox:'Галочка',date:'Дата',select:'Один из списка',link:'Ссылка на таблицу',id:'ID (моно + копия)',card:'Карта (скрытая)'};
+const TYPE_ICONS={text:'𝐀',longtext:'¶',number:'#',checkbox:'☑',date:'📅',select:'◧',link:'↗',id:'⌗',card:'▭'};
+const nowISO=()=>new Date().toISOString();
+const fmtDT=iso=>{if(!iso)return'';const d=new Date(iso);return isNaN(d)?'':d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});};
+
+/* ============ состояние ============ */
+let db=null, downloads=null;
+let tables={}, views={}, rowsByTable={}, rowSubs={}, logDocs={};
+let activeT=null, activeV=null, screen='grid';
+
+let booted=false, cardOpen=null;
+const SESSION=Math.random().toString(36).slice(2,7);
+let role=null; // null = определяется; 'admin' | 'manager' | 'viewer'
+const ROLE_RU={admin:'Админ',manager:'Менеджер',viewer:'Просмотр'};
+const canEdit=()=>role==='admin'||role==='manager';
+const DAY_LIMIT=10;
+const devId=(()=>{try{let v=localStorage.getItem('tb_dev');if(!v){v=Math.random().toString(36).slice(2,10);localStorage.setItem('tb_dev',v);}return v;}catch(e){return 'anon';}})();
+let delCount=null, delCountKey=null;
+function delKey(){return 'limits/'+new Date().toISOString().slice(0,10)+'~'+devId;}
+async function delGuard(n){
+  if(role==='admin')return true;
+  const k=delKey();
+  if(delCountKey!==k){delCount=null;delCountKey=k;}
+  if(delCount===null){
+    try{const s=await db.doc(k).get();delCount=s.exists?(s.data().n||0):0;}
+    catch(e){toast('Не смог проверить лимит удалений — попробуй ещё раз');return false;}
+  }
+  if(delCount+n>DAY_LIMIT){toast(`Лимит удалений на сегодня исчерпан (${DAY_LIMIT} в день). Попроси админа.`);return false;}
+  return true;
+}
+async function delBump(n){
+  if(role==='admin')return;
+  const k=delKey();
+  if(delCountKey!==k){delCountKey=k;delCount=0;}
+  delCount=(delCount||0)+n;
+  try{
+    const s=await db.doc(k).get();
+    if(s.exists)delCount=Math.max(delCount,(s.data().n||0)+n);
+    await db.doc(k).set({n:delCount,at:nowISO(),dev:devId});
+  }catch(e){}
+}
+
+/* ============ роль ============ */
+function renderWho(){
+  if(role===null&&roleFail){
+    $('#whoami').innerHTML='<span class="badge b-ghost">доступ не определился</span> <button class="mini" id="roleretry">повторить</button>';
+    const b=$('#roleretry');if(b)b.addEventListener('click',()=>{$('#whoami').innerHTML='<span class="badge b-ghost">определяю доступ…</span>';detectRole(0);});
+    return;
+  }
+  const cls=role==='admin'?'b-acc':role==='manager'?'b-info':'b-ghost';
+  $('#whoami').innerHTML=role===null?'<span class="badge b-ghost">определяю доступ…</span>':`<span class="badge ${cls}">${ROLE_RU[role]}</span>${role==='manager'&&delCount!=null?` <span class="src-note">удалений сегодня: ${delCount}/${DAY_LIMIT}</span>`:''}`;
+}
+function needWho(){
+  if(canEdit())return true;
+  toast(role===null?'Секунду — определяю уровень доступа…':'У тебя доступ только для просмотра');
+  return false;
+}
+let roleFail=false;
+async function detectRole(attempt){
+  attempt=attempt||0;roleFail=false;
+  try{
+    const a=await db.doc('adminzone/flag').get();
+    if(a.exists){role='admin';render();return;}
+    const m=await db.doc('managerzone/flag').get();
+    role=m.exists?'manager':'viewer';
+    render();
+  }catch(e){
+    if(attempt<3){setTimeout(()=>detectRole(attempt+1),900*(attempt+1));return;}
+    roleFail=true;role=null;renderWho();
+  }
+}
+
+/* ============ db ============ */
+function colsArr(t){return Object.entries(t.cols||{}).filter(([,c])=>c).map(([id,c])=>({id,...c})).sort((a,b)=>(a.order??0)-(b.order??0));}
+function tablesArr(){return Object.entries(tables).filter(([,t])=>t&&!t.deleted).map(([id,t])=>({id,...t})).sort((a,b)=>(a.order??0)-(b.order??0));}
+function viewsFor(tid){return Object.entries(views).filter(([,v])=>v&&v.table===tid).map(([id,v])=>({id,...v})).sort((a,b)=>(a.order??0)-(b.order??0));}
+function rowsArr(tid){return Object.entries(rowsByTable[tid]||{}).map(([id,r])=>({id,...r})).filter(r=>!r.del).sort((a,b)=>(a.o??0)-(b.o??0));}
+function allRowsArr(tid){return Object.entries(rowsByTable[tid]||{}).map(([id,r])=>({id,...r})).sort((a,b)=>(a.o??0)-(b.o??0));}
+function trashArr(tid){return Object.entries(rowsByTable[tid]||{}).map(([id,r])=>({id,...r})).filter(r=>r.del).sort((a,b)=>String(b.uat||'').localeCompare(String(a.uat||'')));}
+
+async function boot(){
+  try{
+    if(!window.claude||!window.claude.use)throw 0;
+    db=await claude.use('db');
+    claude.use('downloads').then(d=>{downloads=d;}).catch(()=>{});
+  }catch(e){db=null;}
+  if(!db){
+    $('#dbfoot').innerHTML='<span class="dbdot"></span>Хранилище недоступно — открой страницу на claude.ai, чтобы видеть и менять данные.';
+    $('#main').innerHTML='<div class="empty">Эта база живёт в общем хранилище страницы.<br>Открой её по ссылке claude.ai — здесь только оболочка.</div>';
+    return;
+  }
+  $('#dbfoot').innerHTML='<span class="dbdot on"></span>Общая база: изменения синхронизируются у всех, у кого есть доступ, и попадают в «Лог действий».';
+  detectRole();
+  db.collection('tables').onSnapshot(s=>{
+    tables={};s.docs.forEach(d=>{if(d.exists)tables[d.id]=d.data();});
+    syncRowSubs();
+    if(!activeT||!tables[activeT]||tables[activeT].deleted){const f=tablesArr()[0];activeT=f?f.id:null;activeV=null;}
+    ensureActiveView();render();booted=true;
+  },e=>toast('Ошибка загрузки таблиц: '+e.code));
+  db.collection('views').onSnapshot(s=>{
+    views={};s.docs.forEach(d=>{if(d.exists)views[d.id]=d.data();});
+    ensureActiveView();render();
+  },e=>{$('#dbfoot').innerHTML='<span class="dbdot"></span>Связь с базой прервалась ('+((e&&e.code)||'')+') — обнови страницу.';});
+}
+function syncRowSubs(){
+  for(const tid of Object.keys(rowSubs)){
+    if(!tables[tid]||tables[tid].deleted){try{rowSubs[tid]()}catch(e){};delete rowSubs[tid];delete rowsByTable[tid];}
+  }
+  for(const tid of Object.keys(tables)){
+    if(tables[tid]&&!tables[tid].deleted&&!rowSubs[tid]){
+      rowSubs[tid]=db.collection('tables/'+tid+'/rows').onSnapshot(s=>{
+        rowsByTable[tid]={};s.docs.forEach(d=>{if(d.exists)rowsByTable[tid][d.id]=d.data();});
+        if(booted)render();
+      },e=>{$('#dbfoot').innerHTML='<span class="dbdot"></span>Связь с базой прервалась ('+((e&&e.code)||'')+') — обнови страницу.';});
+    }
+  }
+}
+function ensureActiveView(){
+  if(!activeT)return;
+  const vs=viewsFor(activeT);
+  if(!activeV||!views[activeV]||views[activeV].table!==activeT)activeV=vs.length?vs[0].id:null;
+}
+
+/* ============ лог действий ============ */
+function logKey(){const d=new Date();return d.toISOString().slice(0,10)+'~'+(role||'viewer')+'~'+SESSION;}
+async function logAction(text,tid,ridv){
+  if(!db)return false;
+  const key='log/'+logKey();
+  try{
+    const cache=logDocs[key]||(await db.doc(key).get().then(s=>s.exists?s.data():{items:[]}));
+    cache.items=(cache.items||[]).slice(-499);
+    cache.items.push({at:nowISO(),by:ROLE_RU[role]||'—',table:tid||null,row:ridv||null,text});
+    logDocs[key]=cache;
+    await db.doc(key).set(cache);
+    return true;
+  }catch(e){console.warn('logAction:',e);return false;}
+}
+
+/* ============ операции с данными ============ */
+async function setCell(tid,ridv,colId,val,oldVal){
+  if(!needWho())return false;
+  try{
+    await db.doc('tables/'+tid+'/rows/'+ridv).update({c:{[colId]:val},uat:nowISO(),uby:ROLE_RU[role]||''});
+    const t=tables[tid],col=(t.cols||{})[colId];
+    logAction(`изменение «${col?col.name:colId}» у записи ${rowTitle(tid,ridv)}: ${cellText(col,oldVal)||'—'} → ${cellText(col,val)||'—'}`,tid,ridv);
+    return true;
+  }catch(e){
+    if(e&&e.code==='invalid_argument'&&!((rowsByTable[tid]||{})[ridv]))toast('Эту запись только что удалили — правка не сохранилась');
+    else toast('Не сохранилось: '+(e&&e.code||''));
+    return false;
+  }
+}
+async function addRow(tid){
+  if(!needWho())return;
+  const rows=rowsArr(tid);
+  const o=(rows.length?Math.max(...rows.map(r=>r.o??0)):0)+10;
+  // новая запись наследует условия фильтров активного вида — иначе вид её сразу спрячет
+  const c={};
+  const v=(activeT===tid)?views[activeV]:null;
+  if(v)for(const f of (v.filters||[])){
+    const col=(tables[tid].cols||{})[f.col];if(!col)continue;
+    if(f.op==='is'&&f.val!=null&&f.val!=='')c[f.col]=col.type==='number'?Number(f.val):f.val;
+    else if(f.op==='eq'&&f.val!=null&&f.val!=='')c[f.col]=Number(f.val);
+    else if(f.op==='checked')c[f.col]=true;
+  }
+  const body={c,o,at:nowISO(),by:ROLE_RU[role]||'',uat:nowISO(),uby:ROLE_RU[role]||''};
+  try{
+    const ref=await db.collection('tables/'+tid+'/rows').add(body);
+    (rowsByTable[tid]=rowsByTable[tid]||{})[ref.id]=body;
+    logAction(`новая запись в «${tables[tid].name}»`,tid,ref.id);
+    toast('Запись создана — заполняй карточку');
+    openRowCard(tid,ref.id);
+    render();
+  }catch(e){toast('Не добавилось: '+(e&&e.code||''));}
+}
+function backlinksOf(tid,ridv){
+  const out=[];
+  for(const ot of tablesArr())for(const oc of colsArr(ot))
+    if(oc.type==='link'&&(oc.opts||{}).table===tid)
+      for(const orow of allRowsArr(ot.id)){
+        const v=(orow.c||{})[oc.id];
+        if(Array.isArray(v)&&v.includes(ridv))out.push({t:ot,row:orow,col:oc});
+      }
+  return out;
+}
+async function deleteRow(tid,ridv){
+  if(!needWho())return;
+  if(!await delGuard(1))return;
+  const title=rowTitle(tid,ridv);
+  try{
+    await db.doc('tables/'+tid+'/rows/'+ridv).update({del:true,uat:nowISO(),uby:ROLE_RU[role]||''});
+    delBump(1);renderWho();
+    logAction(`запись ${title} перенесена в корзину («${tables[tid].name}»)`,tid,ridv);
+    toast('Запись в корзине',{label:'Отменить',fn:async()=>{
+      try{await db.doc('tables/'+tid+'/rows/'+ridv).update({del:null,uat:nowISO(),uby:ROLE_RU[role]||''});logAction(`запись ${title} возвращена из корзины`,tid,ridv);}catch(e){}
+    }});
+  }catch(e){toast('Не удалилось: '+(e&&e.code||''));}
+}
+async function restoreRow(tid,ridv){
+  if(!needWho())return;
+  try{await db.doc('tables/'+tid+'/rows/'+ridv).update({del:null,uat:nowISO(),uby:ROLE_RU[role]||''});
+    logAction(`запись ${rowTitle(tid,ridv).replace('🗑 ','')} возвращена из корзины`,tid,ridv);}catch(e){toast('Не вернулось: '+(e&&e.code||''));}
+}
+async function purgeRow(tid,ridv){
+  if(!needWho())return;
+  if(!await delGuard(1))return;
+  const backs=backlinksOf(tid,ridv);
+  const msg=backs.length?`На эту запись ссылаются: ${backs.map(b=>b.t.name).filter((v,i,a)=>a.indexOf(v)===i).join(', ')} (${backs.length} ссыл.). Ссылки будут убраны. `:'';
+  if(!confirm(msg+'Удалить запись НАСОВСЕМ? Содержимое останется только в логе.'))return;
+  try{
+    const row=(rowsByTable[tid]||{})[ridv];
+    const dump=colsArr(tables[tid]).map(c=>{const v=(row&&row.c||{})[c.id];return v==null?null:c.name+': '+cellText(c,v);}).filter(Boolean).join('; ');
+    const ok=await logAction(`запись окончательно удалена из «${tables[tid].name}» (содержимое: ${dump.slice(0,1500)})`,tid,ridv);
+    if(!ok){toast('Не удалось сохранить копию в лог — запись НЕ удалена');return;}
+    for(const b of backs){
+      const v=((b.row.c||{})[b.col.id]||[]).filter(x=>x!==ridv);
+      await db.doc('tables/'+b.t.id+'/rows/'+b.row.id).update({c:{[b.col.id]:v.length?v:null},uat:nowISO(),uby:ROLE_RU[role]||''});
+    }
+    await db.doc('tables/'+tid+'/rows/'+ridv).delete();
+    delBump(1);renderWho();
+  }catch(e){toast('Не удалилось: '+(e&&e.code||''));}
+}
+async function addColumn(tid,def){
+  if(!needWho())return;
+  const cid=uid('c');
+  const cols=colsArr(tables[tid]);
+  def.order=(cols.length?Math.max(...cols.map(c=>c.order??0)):0)+10;
+  try{
+    await db.doc('tables/'+tid).update({cols:{[cid]:def}});
+    logAction(`новая колонка «${def.name}» (${TYPE_LABELS[def.type]}) в «${tables[tid].name}»`,tid);
+  }catch(e){toast('Не добавилось: '+e.code);}
+}
+async function patchColumn(tid,cid,patch,logText){
+  if(!needWho())return;
+  try{
+    await db.doc('tables/'+tid).update({cols:{[cid]:patch}});
+    if(logText)logAction(logText,tid);
+  }catch(e){toast('Не сохранилось: '+e.code);}
+}
+async function deleteColumn(tid,cid){
+  if(!needWho())return;
+  if(!await delGuard(1))return;
+  const col=(tables[tid].cols||{})[cid];
+  const pc=primaryCol(tables[tid]);
+  if(pc&&pc.id===cid){toast('Первую (главную) колонку удалить нельзя — по ней подписаны записи');return;}
+  if(!confirm(`Удалить колонку «${col.name}»? Значения в записях сохранятся в хранилище (я смогу вернуть колонку, если что), но из таблицы она исчезнет.`))return;
+  try{
+    await db.doc('tables/'+tid).update({cols:{[cid]:null}});
+    for(const v of viewsFor(tid)){
+      const patch={};
+      if((v.filters||[]).some(f=>f.col===cid))patch.filters=(v.filters||[]).filter(f=>f.col!==cid);
+      if((v.hidden||[]).includes(cid))patch.hidden=(v.hidden||[]).filter(h=>h!==cid);
+      if(v.sort&&v.sort.col===cid)patch.sort=null;
+      if(v.colorBy===cid)patch.colorBy=null;
+      if(Object.keys(patch).length)await db.doc('views/'+v.id).update(patch);
+    }
+    logAction(`удалена колонка «${col.name}» из «${tables[tid].name}»`,tid);
+    delBump(1);renderWho();
+  }catch(e){toast('Не удалилось: '+(e&&e.code||''));}
+}
+async function addTable(name){
+  if(!needWho())return;
+  const tid=uid('t');
+  const ts=tablesArr();
+  const order=(ts.length?Math.max(...ts.map(t=>t.order??0)):0)+10;
+  try{
+    await db.doc('tables/'+tid).set({name,order,deleted:false,at:nowISO(),by:ROLE_RU[role]||'',
+      cols:{[uid('c')]:{name:'Название',type:'text',order:0}}});
+    await db.doc('views/'+uid('v')).set({table:tid,name:'Все записи',order:0,filters:[],sort:null,hidden:[],colorBy:null});
+    logAction(`создана таблица «${name}»`);
+    activeT=tid;activeV=null;
+  }catch(e){toast('Не создалось: '+e.code);}
+}
+async function deleteTable(tid){
+  if(role!=='admin'){toast('Убирать таблицы в архив может только админ');return;}
+  const t=tables[tid];
+  if(!confirm(`Убрать таблицу «${t.name}»? Данные останутся в хранилище (смогу восстановить, если передумаешь) — таблица просто исчезнет из списка.`))return;
+  try{
+    await db.doc('tables/'+tid).update({deleted:true});
+    logAction(`таблица «${t.name}» убрана в архив`);
+    if(activeT===tid){activeT=null;}
+  }catch(e){toast('Не получилось: '+e.code);}
+}
+async function saveView(vid,patch){
+  if(!needWho())return;
+  try{await db.doc('views/'+vid).update(patch);}catch(e){toast('Вид не сохранился: '+e.code);}
+}
+async function addView(tid){
+  if(!needWho())return;
+  const name=prompt('Название вида:','Новый вид');if(!name)return;
+  const vs=viewsFor(tid);
+  const vid=uid('v');
+  try{
+    await db.doc('views/'+vid).set({table:tid,name,order:(vs.length?Math.max(...vs.map(v=>v.order??0)):0)+10,filters:[],sort:null,hidden:[],colorBy:null});
+    activeV=vid;logAction(`новый вид «${name}» в «${tables[tid].name}»`,tid);
+  }catch(e){toast('Не создалось: '+e.code);}
+}
+async function deleteView(vid){
+  if(!needWho())return;
+  const v=views[vid];
+  if(viewsFor(v.table).length<=1){toast('Нельзя удалить последний вид таблицы');return;}
+  if(!confirm(`Удалить вид «${v.name}»? Данные не пострадают — это только настройка отображения.`))return;
+  try{await db.doc('views/'+vid).delete();logAction(`удалён вид «${v.name}»`);activeV=null;ensureActiveView();render();}catch(e){toast('Не удалилось: '+e.code);}
+}
+
+/* ============ представление значений ============ */
+function choiceOf(col,val){return ((col.opts||{}).choices||[]).find(c=>c.id===val);}
+function primaryCol(t){return colsArr(t).find(c=>c.type!=='link')||colsArr(t)[0];}
+function rowTitle(tid,ridv){
+  const t=tables[tid];if(!t)return '(удалено)';
+  const row=(rowsByTable[tid]||{})[ridv];if(!row)return '(удалено)';
+  const first=primaryCol(t);
+  const v=first?(row.c||{})[first.id]:null;
+  const s=(v==null||first.type==='link')?'':cellText(first,v);
+  return (row.del?'🗑 ':'')+(s||('запись '+ridv.slice(-4)));
+}
+function cellText(col,val){
+  if(val==null||val==='')return'';
+  if(!col)return String(val);
+  if(col.type==='checkbox')return val?'да':'нет';
+  if(col.type==='select'){const ch=choiceOf(col,val);return ch?ch.label:String(val);}
+  if(col.type==='link')return (Array.isArray(val)?val:[val]).map(r=>rowTitle((col.opts||{}).table,r)).join(', ');
+  if(col.type==='card')return val&&val.n?('•••• '+String(val.n).replace(/ /g,'').slice(-4)):'';
+  return String(val);
+}
+function renderCellHTML(col,val){
+  if(val==null||val===''||(Array.isArray(val)&&!val.length))return'<span class="dim"></span>';
+  switch(col.type){
+    case 'checkbox':return val?'<span class="checkmark">✓</span>':'';
+    case 'select':{const ch=choiceOf(col,val);if(!ch)return esc(String(val));
+      return `<span class="pill" style="background:var(--cs-${safeColor(ch.color)});color:var(--c-${safeColor(ch.color)})">${esc(ch.label)}</span>`;}
+    case 'link':{const arr=Array.isArray(val)?val:[val];return arr.slice(0,4).map(r=>`<span class="linkchip">${esc(rowTitle((col.opts||{}).table,r))}</span>`).join('')+((arr.length>4)?`<span class="dim">+${arr.length-4}</span>`:'');}
+    case 'id':return `<span class="mono">${esc(String(val))}</span>`;
+    case 'card':return `<span class="mono">•••• ${esc(String(val.n||'').replace(/ /g,'').slice(-4))}${val.exp?' · '+esc(val.exp):''}</span>`;
+    case 'number':return `<span class="mono">${esc(String(val))}</span>`;
+    case 'date':return `<span class="mono">${esc(String(val))}</span>`;
+    case 'longtext':return esc(String(val).slice(0,120));
+    default:return esc(String(val));
+  }
+}
+
+/* ============ фильтры/сортировка ============ */
+const OPS_BY_TYPE={
+  text:['contains','is','empty','not_empty'],longtext:['contains','empty','not_empty'],
+  id:['contains','is','empty','not_empty'],number:['eq','gt','lt','empty','not_empty'],
+  checkbox:['checked','unchecked'],date:['is','before','after','empty','not_empty'],
+  select:['is','not','empty','not_empty'],link:['contains','empty','not_empty'],card:['contains','empty','not_empty'],
+};
+const OP_LABELS={contains:'содержит',is:'равно',not:'не равно',empty:'пусто',not_empty:'не пусто',eq:'=',gt:'>',lt:'<',before:'до',after:'после',checked:'стоит',unchecked:'не стоит'};
+function passFilter(col,val,f){
+  const s=v=>String(v??'').toLowerCase();
+  const txt=col?cellText(col,val).toLowerCase():s(val);
+  switch(f.op){
+    case 'contains':return txt.includes(s(f.val));
+    case 'is':return col&&col.type==='select'?val===f.val:txt===s(f.val);
+    case 'not':return val!==f.val;
+    case 'empty':return val==null||val===''||(Array.isArray(val)&&!val.length);
+    case 'not_empty':return !(val==null||val===''||(Array.isArray(val)&&!val.length));
+    case 'eq':return Number(val)===Number(f.val);
+    case 'gt':return Number(val)>Number(f.val);
+    case 'lt':return Number(val)<Number(f.val);
+    case 'before':return String(val||'')<String(f.val||'');
+    case 'after':return String(val||'')>String(f.val||'');
+    case 'checked':return !!val;
+    case 'unchecked':return !val;
+    default:return true;
+  }
+}
+function visibleRows(){
+  const v=views[activeV]||{filters:[],sort:null};
+  const t=tables[activeT];if(!t)return[];
+  let rows=rowsArr(activeT);
+  for(const f of (v.filters||[])){
+    const col=(t.cols||{})[f.col];if(!col)continue;
+    rows=rows.filter(r=>passFilter({...col},(r.c||{})[f.col],f));
+  }
+  if(v.sort&&v.sort.col){
+    const col=(t.cols||{})[v.sort.col];
+    const dir=v.sort.dir==='desc'?-1:1;
+    rows.sort((a,b)=>{
+      let av=(a.c||{})[v.sort.col],bv=(b.c||{})[v.sort.col];
+      if(col&&col.type==='number'){av=Number(av)||0;bv=Number(bv)||0;}
+      else if(col&&col.type==='checkbox'){av=av?1:0;bv=bv?1:0;}
+      else{av=col?cellText({...col},av):String(av||'');bv=col?cellText({...col},bv):String(bv||'');}
+      return av<bv?-dir:av>bv?dir:0;
+    });
+  }
+  return rows;
+}
+
+/* ============ сайдбар ============ */
+function renderSide(){
+  const ts=tablesArr();
+  let h=`<div class="side-h">Таблицы ${canEdit()?'<button data-act="addtable" title="Новая таблица">＋</button>':''}</div>`;
+  for(const t of ts){
+    const cnt=Object.keys(rowsByTable[t.id]||{}).length;
+    h+=`<div class="titem ${screen==='grid'&&activeT===t.id?'on':''}" data-tsel="${t.id}"><span>▦</span>${esc(t.name)}<span class="cnt">${cnt}</span></div>`;
+    if(screen==='grid'&&activeT===t.id){
+      for(const v of viewsFor(t.id))
+        h+=`<div class="vitem ${activeV===v.id?'on':''}" data-vsel="${v.id}"><span class="dot"></span>${esc(v.name)}</div>`;
+      if(canEdit())h+=`<button class="vadd" data-act="addview">+ вид</button>`;
+    }
+  }
+  if(canEdit()){
+    h+=`<div class="side-h" style="margin-top:8px">Команда</div>`;
+    h+=`<div class="titem ${screen==='buyers'||screen==='buyer'?'on':''}" data-act="buyers"><span>◎</span>Байеры<span class="cnt">${Object.keys(buyersRegistry()).length}</span></div>`;
+  }
+  if(role==='admin'){
+    h+=`<div class="side-h" style="margin-top:8px">Сервис</div>`;
+    h+=`<div class="titem ${screen==='log'?'on':''}" data-act="log"><span>≡</span>Лог действий</div>`;
+    h+=`<div class="titem ${screen==='analytics'?'on':''}" data-act="analytics"><span>◔</span>Аналитика</div>`;
+  }
+  $('#sidelist').innerHTML=h;
+}
+$('#sidelist').addEventListener('click',e=>{
+  const t=e.target.closest('[data-tsel]');if(t){screen='grid';activeT=t.dataset.tsel;activeV=null;ensureActiveView();render();return;}
+  const v=e.target.closest('[data-vsel]');if(v){activeV=v.dataset.vsel;render();return;}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  if(a.dataset.act==='addtable'){const n=prompt('Название новой таблицы:');if(n)addTable(n.trim());}
+  if(a.dataset.act==='addview')addView(activeT);
+  if(a.dataset.act==='log'&&role==='admin'){screen='log';render();}
+  if(a.dataset.act==='buyers'&&canEdit()){screen='buyers';buyerSel=null;render();window.scrollTo(0,0);}
+  if(a.dataset.act==='analytics'){screen='analytics';render();}
+});
+
+/* ============ грид ============ */
+function render(){
+  const gw0=document.querySelector('.gridwrap');
+  const sc=gw0?{t:gw0.scrollTop,l:gw0.scrollLeft}:null;
+  renderWho();renderSide();
+  if(cardOpen)openRowCard(cardOpen.tid,cardOpen.ridv);
+  if(screen==='log'){if(role!=='admin'){screen='grid';}else{if(!document.querySelector('[data-screen="log"]'))renderLog();return;}}
+  if(screen==='analytics'){if(!document.querySelector('[data-screen="an"]'))renderAnalytics();return;}
+  if(screen==='buyers'){if(!canEdit()){screen='grid';}else{if(!document.querySelector('[data-screen="buyers"]'))renderBuyers();return;}}
+  if(screen==='buyer'){if(!canEdit()){screen='grid';}else{if(!document.querySelector('[data-screen="buyer"]'))renderBuyerCard();return;}}
+  if(screen==='account'){if(!document.querySelector('[data-screen="account"]'))renderAccountCard();return;}
+  const t=tables[activeT];
+  if(!t){$('#main').innerHTML='<div class="empty">Нет таблиц. Создай первую кнопкой «＋» слева.</div>';return;}
+  const v=views[activeV]||{filters:[],sort:null,hidden:[],colorBy:null};
+  const cols=colsArr(t).filter(c=>!(v.hidden||[]).includes(c.id));
+  const rows=visibleRows();
+  const colorCol=v.colorBy?(t.cols||{})[v.colorBy]:null;
+  let thead=`<tr><th style="min-width:46px"></th>`;
+  for(const c of cols){
+    const w=c.opts&&+c.opts.width?Math.max(70,+c.opts.width):null;
+    thead+=`<th data-colhead="${c.id}" ${w?`style="width:${w}px;min-width:${w}px"`:''}><div class="hd" ${w?`style="min-width:${w}px"`:''} ${canEdit()?'':'style="cursor:default"'}><span class="ty">${TYPE_ICONS[c.type]||''}</span>${esc(c.name)}</div>${canEdit()?`<span class="col-rs" data-rs="${c.id}"></span>`:''}</th>`;
+  }
+  thead+=canEdit()?`<th class="addcol" data-addcol="1" title="Добавить колонку">＋</th></tr>`:`<th></th></tr>`;
+  let body='';
+  rows.forEach((r,i)=>{
+    let rowStyle='';
+    if(colorCol){const ch=choiceOf({...colorCol},(r.c||{})[v.colorBy]);if(ch)rowStyle=`style="--rowbg:var(--cs-${safeColor(ch.color)})"`;}
+    body+=`<tr ${rowStyle}><td class="rownum" data-openrow="${r.id}" title="Открыть карточку"><span class="num">${i+1}</span><span class="open">⤢</span></td>`;
+    for(const c of cols){
+      const val=(r.c||{})[c.id];
+      body+=`<td ${rowStyle?`style="background:var(--rowbg)"`:''}><div class="cell" data-cell="${r.id}:${c.id}">${renderCellHTML(c,val)}</div></td>`;
+    }
+    body+=`<td></td></tr>`;
+  });
+  if(canEdit())body+=`<tr class="addrow"><td colspan="${cols.length+2}" data-addrow="1" style="padding:8px 12px">＋ новая запись</td></tr>`;
+  const filtersN=(v.filters||[]).length;
+  $('#main').innerHTML=`
+    <div class="tb">
+      <span class="tname" ${role==='admin'?'data-rename-table title="Переименовать (клик)"':'style="cursor:default"'}>${esc(t.name)}</span>
+      <span class="dim">/</span>
+      <span class="vname" ${role==='admin'?'data-rename-view title="Переименовать вид"':'style="cursor:default"'}>${esc(v.name||'')}</span>
+      ${canEdit()?`<button class="tbtn ${filtersN?'active':''}" data-tb="filters">Фильтры${filtersN?' · '+filtersN:''}</button>
+      <button class="tbtn ${v.sort?'active':''}" data-tb="sort">Сортировка</button>
+      <button class="tbtn ${(v.hidden||[]).length?'active':''}" data-tb="hide">Колонки</button>
+      <button class="tbtn ${v.colorBy?'active':''}" data-tb="color">Цвет</button>`:''}
+      <span class="sp"></span>
+      <span class="rocount">${rows.length} из ${rowsArr(activeT).length}</span>
+      <button class="tbtn" data-tb="export">Экспорт</button>
+      ${canEdit()?`<button class="tbtn" data-tb="tablemenu">⋯</button>
+      <button class="tbtn primary" data-addrow="1">＋ запись</button>`:''}
+    </div>
+    <div class="gridwrap"><table class="grid"><thead>${thead}</thead><tbody>${body}</tbody></table></div>`;
+  const gw1=document.querySelector('.gridwrap');
+  if(gw1&&sc){gw1.scrollTop=sc.t;gw1.scrollLeft=sc.l;}
+}
+
+/* ============ поповеры ============ */
+let popEl=null;
+function closePop(){if(popEl){popEl.remove();popEl=null;}}
+function popupAt(anchor,html,{width}={}){
+  closePop();
+  popEl=el(`<div class="pop" ${width?`style="width:${width}px"`:''}>${html}</div>`);
+  document.getElementById('poplayer').appendChild(popEl);
+  const r=anchor.getBoundingClientRect(),pw=popEl.offsetWidth,ph=popEl.offsetHeight;
+  let x=Math.min(r.left,innerWidth-pw-10),y=r.bottom+4;
+  if(y+ph>innerHeight-10)y=Math.max(10,r.top-ph-4);
+  popEl.style.left=Math.max(10,x)+'px';popEl.style.top=y+'px';
+  return popEl;
+}
+document.addEventListener('mousedown',e=>{
+  if(popEl&&!popEl.contains(e.target)){
+    const fn=popEl._commitOnClose; // клик мимо = сохранить набранное, не потерять
+    if(fn){popEl._commitOnClose=null;fn();}
+    closePop();
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(popEl)popEl._commitOnClose=null; // Escape = отмена без сохранения
+    closePop();closeDrawer();
+  }
+});
+
+/* ============ редакторы ячеек ============ */
+function openCellEditor(anchor,tid,ridv,col){
+  const row=(rowsByTable[tid]||{})[ridv];if(!row)return;
+  const val=(row.c||{})[col.id];
+  let committed=false;
+  const commit=async v=>{if(committed)return;committed=true;closePop();if(JSON.stringify(v??null)!==JSON.stringify(val??null))await setCell(tid,ridv,col.id,v??null,val);};
+  if(col.type==='checkbox'){setCell(tid,ridv,col.id,!val,val);return;}
+  if(col.type==='text'||col.type==='id'||col.type==='number'){
+    const p=popupAt(anchor,`<div class="sec"><input type="${col.type==='number'?'number':'text'}" id="ce" value="${esc(val??'')}" style="width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:7px 9px"></div>
+      ${col.type==='id'&&val?`<button class="mrow" id="cecopy">Копировать ID</button>`:''}`,{width:Math.max(260,anchor.offsetWidth)});
+    const inp=p.querySelector('#ce');inp.focus();inp.select();
+    inp.addEventListener('paste',async e=>{
+      const txt=(e.clipboardData||window.clipboardData).getData('text');
+      const lines=String(txt||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+      if(lines.length>1&&col.type!=='number'){
+        e.preventDefault();
+        if(!confirm(`В буфере ${lines.length} строк. Заполнить эту ячейку первой строкой и создать ещё ${lines.length-1} записей с остальными?`)){inp.value=lines.join(' ');return;}
+        closePop();
+        await setCell(tid,ridv,col.id,lines[0],val);
+        let o=Math.max(0,...rowsArr(tid).map(r=>r.o??0));
+        for(const line of lines.slice(1)){
+          o+=10;
+          try{await db.collection('tables/'+tid+'/rows').add({c:{[col.id]:line},o,at:nowISO(),by:ROLE_RU[role]||'',uat:nowISO(),uby:ROLE_RU[role]||''});}catch(err){toast('Часть строк не создалась: '+(err&&err.code||''));break;}
+        }
+        logAction(`пакетно добавлено ${lines.length-1} записей в «${tables[tid].name}» (колонка «${col.name}»)`,tid);
+        return;
+      }
+    });
+    const commitInput=()=>commit(col.type==='number'?(inp.value===''?null:Number(inp.value)):inp.value.trim()||null);
+    p._commitOnClose=commitInput;
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){p._commitOnClose=null;commitInput();}});
+    const cp=p.querySelector('#cecopy');if(cp)cp.addEventListener('click',()=>{navigator.clipboard.writeText(String(val));toast('ID скопирован');p._commitOnClose=null;closePop();});
+    return;
+  }
+  if(col.type==='longtext'){
+    const p=popupAt(anchor,`<div class="sec"><textarea id="ce">${esc(val??'')}</textarea></div><div class="btnrow"><button class="btn ghost" id="cx">Отмена</button><button class="btn" id="ok">Сохранить</button></div>`,{width:340});
+    p.querySelector('#ce').focus();
+    p._commitOnClose=()=>commit(p.querySelector('#ce').value.trim()||null);
+    p.querySelector('#ok').addEventListener('click',()=>{p._commitOnClose=null;commit(p.querySelector('#ce').value.trim()||null);});
+    p.querySelector('#cx').addEventListener('click',()=>{p._commitOnClose=null;closePop();});
+    return;
+  }
+  if(col.type==='date'){
+    const p=popupAt(anchor,`<div class="sec"><input type="date" id="ce" value="${esc(val??'')}"></div><div class="btnrow"><button class="btn ghost" id="clr">Очистить</button><button class="btn" id="ok">Сохранить</button></div>`);
+    p.querySelector('#ok').addEventListener('click',()=>commit(p.querySelector('#ce').value||null));
+    p.querySelector('#clr').addEventListener('click',()=>commit(null));
+    return;
+  }
+  if(col.type==='select'){
+    const chs=((col.opts||{}).choices||[]);
+    const p=popupAt(anchor,`<div class="sec" style="padding:8px 10px"><input type="text" id="sq" placeholder="Найти или создать…"></div><div id="slist"></div><button class="mrow" data-ch="">— пусто —</button>`,{width:250});
+    const draw=()=>{
+      const q=p.querySelector('#sq').value.trim().toLowerCase();
+      const list=q?chs.filter(c=>c.label.toLowerCase().includes(q)):chs;
+      p.querySelector('#slist').innerHTML=list.map(c=>`<button class="selopt" data-ch="${esc(c.id)}"><span class="pill" style="background:var(--cs-${safeColor(c.color)});color:var(--c-${safeColor(c.color)})">${esc(c.label)}</span>${val===c.id?'<span style="margin-left:auto;font-size:11px;color:var(--muted)">✓</span>':''}</button>`).join('')+
+        (q&&!chs.some(c=>c.label.toLowerCase()===q)?`<button class="mrow" id="snew">＋ создать вариант «${esc(p.querySelector('#sq').value.trim())}»</button>`:'');
+    };
+    draw();
+    p.querySelector('#sq').addEventListener('input',debounce(draw,120));
+    p.querySelector('#sq').focus();
+    p.addEventListener('click',async e=>{
+      const nb=e.target.closest('#snew');
+      if(nb){
+        const label=p.querySelector('#sq').value.trim();if(!label)return;
+        const nch={id:uid('o'),label,color:COLORS[chs.length%COLORS.length]};
+        await patchColumn(tid,col.id,{opts:{...(col.opts||{}),choices:[...chs,nch]}},`в «${col.name}» добавлен вариант «${label}»`);
+        commit(nch.id);return;
+      }
+      const b=e.target.closest('[data-ch]');if(b)commit(b.dataset.ch||null);
+    });
+    return;
+  }
+  if(col.type==='card'){
+    const c=val||{};
+    const p=popupAt(anchor,`<div class="sec">
+        <label>Номер</label><input type="text" id="cn" class="mono" value="${esc(c.n||'')}" placeholder="0000 0000 0000 0000">
+        <label style="margin-top:8px">Срок</label><input type="text" id="ce2" value="${esc(c.exp||'')}" placeholder="MM/YY">
+        <label style="margin-top:8px">CVV</label><input type="text" id="cv" value="${esc(c.cvv||'')}" placeholder="123">
+      </div><div class="btnrow">${c.n?'<button class="btn ghost" id="ccopy">Копировать</button>':''}<button class="btn" id="ok">Сохранить</button></div>`,{width:280});
+    const commitCard=()=>{
+      const n=p.querySelector('#cn').value.trim();
+      commit(n?{n,exp:p.querySelector('#ce2').value.trim(),cvv:p.querySelector('#cv').value.trim()}:null);
+    };
+    p._commitOnClose=commitCard;
+    p.querySelector('#ok').addEventListener('click',()=>{p._commitOnClose=null;commitCard();});
+    const cc=p.querySelector('#ccopy');if(cc)cc.addEventListener('click',()=>{navigator.clipboard.writeText(`${c.n} ${c.exp||''} ${c.cvv||''}`.trim());toast('Карта скопирована');});
+    return;
+  }
+  if(col.type==='link'){
+    const targetT=(col.opts||{}).table;
+    const selected=Array.isArray(val)?[...val]:(val?[val]:[]);
+    const tt=tables[targetT]||{};
+    const selCol=colsArr(tt).find(c=>c.type==='select');
+    const renderList=(q)=>{
+      const all=rowsArr(targetT).map(r=>{
+        const chv=selCol?choiceOf(selCol,(r.c||{})[selCol.id]):null;
+        const arch=chv&&/архив/i.test(chv.label||'');
+        return {id:r.id,title:rowTitle(targetT,r.id),chv,arch};
+      });
+      all.sort((a,b)=>(a.arch?1:0)-(b.arch?1:0));
+      const list=q?all.filter(x=>x.title.toLowerCase().includes(q.toLowerCase())):all;
+      return list.slice(0,60).map(x=>`<button class="selopt" data-lr="${x.id}">${selected.includes(x.id)?'✓ ':''}${esc(x.title)}${x.chv?` <span class="pill" style="margin-left:auto;background:var(--cs-${safeColor(x.chv.color)});color:var(--c-${safeColor(x.chv.color)})">${esc(x.chv.label)}</span>`:''}</button>`).join('')||'<div class="empty" style="padding:10px">Не найдено</div>';
+    };
+    const p=popupAt(anchor,`<div class="sec">
+        <div id="lchips" style="margin-bottom:6px">${selected.map(s=>`<span class="linkchip">${esc(rowTitle(targetT,s))} <button class="chip-x" data-unlink="${s}">✕</button></span>`).join('')||'<span class="dim" style="font-size:12px">ничего не выбрано</span>'}</div>
+        <input type="text" id="lq" placeholder="Поиск в «${esc((tables[targetT]||{}).name||'')}»…"></div>
+      <div id="llist">${renderList('')}</div>
+      <div class="btnrow"><button class="btn" id="ok">Готово</button></div>`,{width:320});
+    const refresh=()=>{
+      p.querySelector('#lchips').innerHTML=selected.map(s=>`<span class="linkchip">${esc(rowTitle(targetT,s))} <button class="chip-x" data-unlink="${s}">✕</button></span>`).join('')||'<span class="dim" style="font-size:12px">ничего не выбрано</span>';
+      p.querySelector('#llist').innerHTML=renderList(p.querySelector('#lq').value);
+    };
+    p._commitOnClose=()=>commit(selected.length?selected:null);
+    p.addEventListener('click',e=>{
+      const lr=e.target.closest('[data-lr]');
+      if(lr){const id=lr.dataset.lr;const i=selected.indexOf(id);if(i>=0)selected.splice(i,1);else selected.push(id);refresh();return;}
+      const ul=e.target.closest('[data-unlink]');
+      if(ul){const i=selected.indexOf(ul.dataset.unlink);if(i>=0)selected.splice(i,1);refresh();return;}
+      if(e.target.id==='ok'){p._commitOnClose=null;commit(selected.length?selected:null);}
+    });
+    p.querySelector('#lq').addEventListener('input',debounce(refresh,150));
+    p.querySelector('#lq').focus();
+    return;
+  }
+}
+
+/* ============ меню и панели ============ */
+function colFormHTML(def){
+  def=def||{name:'',type:'text'};
+  return `<div class="sec"><label>Название</label><input type="text" id="cf-name" value="${esc(def.name)}">
+    <label style="margin-top:8px">Тип</label>
+    <select id="cf-type">${Object.entries(TYPE_LABELS).map(([k,l])=>`<option value="${k}" ${def.type===k?'selected':''}>${l}</option>`).join('')}</select>
+    <div id="cf-extra" style="margin-top:8px"></div></div>`;
+}
+function colFormExtra(p,type,def){
+  const ex=p.querySelector('#cf-extra');
+  if(type==='select'){
+    const chs=(def&&def.opts&&def.opts.choices)?JSON.parse(JSON.stringify(def.opts.choices)):[{id:uid('o'),label:'',color:'green'}];
+    const draw=()=>{ex.innerHTML=`<label>Варианты</label>`+chs.map((c,i)=>`<div class="optrow">
+        <input type="text" data-oi="${i}" value="${esc(c.label)}" placeholder="вариант">
+        <span class="swatch" data-ci="${i}" style="background:var(--cs-${safeColor(c.color)});box-shadow:inset 0 0 0 6px var(--cs-${safeColor(c.color)}),inset 0 0 0 20px var(--c-${safeColor(c.color)})" title="цвет"></span>
+        <button class="chip-x" data-di="${i}">✕</button></div>`).join('')+`<button class="mrow" id="cf-addopt" style="padding:5px 0">＋ вариант</button>`;
+      ex.querySelectorAll('[data-oi]').forEach(inp=>inp.addEventListener('input',()=>{chs[+inp.dataset.oi].label=inp.value;}));
+      ex.querySelectorAll('[data-ci]').forEach(sw=>sw.addEventListener('click',()=>{const c=chs[+sw.dataset.ci];c.color=COLORS[(COLORS.indexOf(c.color)+1)%COLORS.length];draw();}));
+      ex.querySelectorAll('[data-di]').forEach(b=>b.addEventListener('click',()=>{chs.splice(+b.dataset.di,1);draw();}));
+      ex.querySelector('#cf-addopt').addEventListener('click',()=>{chs.push({id:uid('o'),label:'',color:COLORS[chs.length%COLORS.length]});draw();});
+    };
+    draw();
+    return ()=>({choices:chs.filter(c=>c.label.trim()).map(c=>({id:c.id,label:c.label.trim(),color:c.color}))});
+  }
+  if(type==='link'){
+    ex.innerHTML=`<label>Куда ссылается</label><select id="cf-link">${tablesArr().map(t=>`<option value="${t.id}" ${def&&def.opts&&def.opts.table===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select>`;
+    return ()=>({table:ex.querySelector('#cf-link').value});
+  }
+  ex.innerHTML='';return ()=>null;
+}
+function openColForm(anchor,tid,cid){
+  const existing=cid?{...(tables[tid].cols||{})[cid]}:null;
+  const pcol=primaryCol(tables[tid]);
+  const isPrimary=cid&&pcol&&pcol.id===cid;
+  const p=popupAt(anchor,colFormHTML(existing)+`<div class="btnrow">${cid?`<button class="btn ghost" id="cf-left" title="Сдвинуть влево">←</button><button class="btn ghost" id="cf-right" title="Сдвинуть вправо">→</button>`:''}${cid&&!isPrimary?'<button class="btn ghost" id="cf-del" style="margin-right:auto;color:var(--c-red)">Удалить</button>':''}<button class="btn" id="cf-ok" style="margin-left:auto">${cid?'Сохранить':'Добавить'}</button></div>`+(isPrimary?'<div class="sec hint">Это главная колонка — по ней подписываются записи в ссылках и поиске. Её нельзя удалить или скрыть.</div>':''),{width:300});
+  if(cid){
+    const move=async dir=>{
+      const cols=colsArr(tables[tid]);
+      const i=cols.findIndex(c=>c.id===cid);const j=i+dir;
+      if(j<0||j>=cols.length)return;
+      await patchColumn(tid,cid,{order:cols[j].order??0},null);
+      await patchColumn(tid,cols[j].id,{order:cols[i].order??0},null);
+    };
+    p.querySelector('#cf-left').addEventListener('click',()=>move(-1));
+    p.querySelector('#cf-right').addEventListener('click',()=>move(1));
+  }
+  let getOpts=colFormExtra(p,existing?existing.type:'text',existing);
+  const typeSel=p.querySelector('#cf-type');
+  if(cid)typeSel.disabled=true; else typeSel.addEventListener('change',()=>{getOpts=colFormExtra(p,typeSel.value,null);});
+  p.querySelector('#cf-ok').addEventListener('click',()=>{
+    const name=p.querySelector('#cf-name').value.trim();if(!name){toast('Дай колонке имя');return;}
+    const type=typeSel.value;const opts=getOpts();
+    closePop();
+    if(cid)patchColumn(tid,cid,{name,...(opts?{opts}:{})},`колонка «${name}» изменена в «${tables[tid].name}»`);
+    else addColumn(tid,{name,type,...(opts?{opts}:{})});
+  });
+  const del=p.querySelector('#cf-del');if(del)del.addEventListener('click',()=>{closePop();deleteColumn(tid,cid);});
+  p.querySelector('#cf-name').focus();
+}
+function openViewPanel(anchor,kind){
+  const v=views[activeV];const t=tables[activeT];if(!v||!t)return;
+  const cols=colsArr(t);
+  if(kind==='filters'){
+    const fs=JSON.parse(JSON.stringify(v.filters||[]));
+    const draw=p=>{
+      p.querySelector('#fl').innerHTML=fs.map((f,i)=>{
+        const col=(t.cols||{})[f.col]||cols[0];
+        const ops=OPS_BY_TYPE[col.type]||['contains'];
+        const needVal=!['empty','not_empty','checked','unchecked'].includes(f.op);
+        let valInput='';
+        if(needVal){
+          if(col.type==='select'&&!((col.opts||{}).choices||[]).some(c=>c.id===f.val))f.val=((((col.opts||{}).choices||[])[0])||{}).id||'';
+          if(col.type==='select')valInput=`<select data-fv="${i}">${((col.opts||{}).choices||[]).map(c=>`<option value="${esc(c.id)}" ${f.val===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}</select>`;
+          else valInput=`<input type="text" data-fv="${i}" value="${esc(f.val??'')}">`;
+        }
+        return `<div class="frow"><select data-fc="${i}">${cols.map(c=>`<option value="${c.id}" ${f.col===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+          <select data-fo="${i}">${ops.map(o=>`<option value="${o}" ${f.op===o?'selected':''}>${OP_LABELS[o]}</option>`).join('')}</select>
+          ${valInput}<button class="chip-x" data-fd="${i}">✕</button></div>`;
+      }).join('')||'<div class="hint">Фильтров нет — показываются все записи.</div>';
+      p.querySelectorAll('[data-fc]').forEach(s=>s.addEventListener('change',()=>{const f=fs[+s.dataset.fc];f.col=s.value;const c=(t.cols||{})[f.col];f.op=(OPS_BY_TYPE[c.type]||['contains'])[0];f.val='';draw(p);}));
+      p.querySelectorAll('[data-fo]').forEach(s=>s.addEventListener('change',()=>{fs[+s.dataset.fo].op=s.value;draw(p);}));
+      p.querySelectorAll('[data-fv]').forEach(s=>s.addEventListener('input',()=>{fs[+s.dataset.fv].val=s.value;}));
+      p.querySelectorAll('[data-fd]').forEach(b=>b.addEventListener('click',()=>{fs.splice(+b.dataset.fd,1);draw(p);}));
+    };
+    const p=popupAt(anchor,`<div class="sec"><label>Фильтры вида «${esc(v.name)}»</label><div id="fl"></div>
+      <button class="mrow" id="fadd" style="padding:6px 0">＋ фильтр</button></div>
+      <div class="btnrow"><button class="btn" id="fok">Применить</button></div>`,{width:380});
+    draw(p);
+    p.querySelector('#fadd').addEventListener('click',()=>{const c=cols[0];fs.push({col:c.id,op:(OPS_BY_TYPE[c.type]||['contains'])[0],val:''});draw(p);});
+    p.querySelector('#fok').addEventListener('click',()=>{closePop();saveView(activeV,{filters:fs});});
+  }
+  if(kind==='sort'){
+    const p=popupAt(anchor,`<div class="sec"><label>Сортировка</label>
+      <div class="frow"><select id="sc"><option value="">— нет —</option>${cols.map(c=>`<option value="${c.id}" ${v.sort&&v.sort.col===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+      <select id="sd"><option value="asc" ${v.sort&&v.sort.dir!=='desc'?'selected':''}>по возрастанию</option><option value="desc" ${v.sort&&v.sort.dir==='desc'?'selected':''}>по убыванию</option></select></div></div>
+      <div class="btnrow"><button class="btn" id="ok">Применить</button></div>`,{width:320});
+    p.querySelector('#ok').addEventListener('click',()=>{
+      const c=p.querySelector('#sc').value;closePop();
+      saveView(activeV,{sort:c?{col:c,dir:p.querySelector('#sd').value}:null});
+    });
+  }
+  if(kind==='hide'){
+    const hidden=new Set(v.hidden||[]);
+    const pcol2=primaryCol(t);
+    const p=popupAt(anchor,`<div class="sec"><label>Колонки этого вида</label>${cols.map(c=>`<label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px"><input type="checkbox" data-hc="${c.id}" ${hidden.has(c.id)?'':'checked'} ${pcol2&&pcol2.id===c.id?'disabled':''}> ${esc(c.name)}${pcol2&&pcol2.id===c.id?' <span class="hint">(главная)</span>':''}</label>`).join('')}</div>
+      <div class="btnrow"><button class="btn" id="ok">Применить</button></div>`,{width:260});
+    p.querySelector('#ok').addEventListener('click',()=>{
+      const h=[];p.querySelectorAll('[data-hc]').forEach(cb=>{if(!cb.checked)h.push(cb.dataset.hc);});
+      closePop();saveView(activeV,{hidden:h});
+    });
+  }
+  if(kind==='color'){
+    const selCols=cols.filter(c=>c.type==='select');
+    const p=popupAt(anchor,`<div class="sec"><label>Подкрашивать строки по колонке</label>
+      <select id="cb"><option value="">— не красить —</option>${selCols.map(c=>`<option value="${c.id}" ${v.colorBy===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+      <div class="hint" style="margin-top:6px">Строки красятся сами — по значению выбранной колонки типа «Один из списка». Пример: в «Аккаунтах» включено по «Статусу» — поставила статус «чекпоинт», строка покраснела; «актив» — позеленела. Цвета вариантов настраиваются кликом по заголовку колонки (кружок рядом с вариантом переключает цвет).</div></div>
+      <div class="btnrow"><button class="btn" id="ok">Применить</button></div>`,{width:300});
+    p.querySelector('#ok').addEventListener('click',()=>{closePop();saveView(activeV,{colorBy:p.querySelector('#cb').value||null});});
+  }
+  if(kind==='tablemenu'){
+    const trashN=trashArr(activeT).length;
+    const p=popupAt(anchor,`
+      ${role==='admin'?'<button class="mrow" id="tm-ren">Переименовать таблицу</button><button class="mrow" id="tm-renv">Переименовать вид</button>':''}
+      <button class="mrow" id="tm-delv">Удалить вид</button>
+      <button class="mrow" id="tm-trash">Корзина${trashN?` <span class="k">${trashN}</span>`:''}</button>
+      ${role==='admin'?'<button class="mrow danger" id="tm-del">Убрать таблицу в архив</button>':''}`);
+    p.querySelector('#tm-ren')?.addEventListener('click',()=>{closePop();renameTable();});
+    p.querySelector('#tm-renv')?.addEventListener('click',()=>{closePop();renameView();});
+    p.querySelector('#tm-delv').addEventListener('click',()=>{closePop();deleteView(activeV);});
+    p.querySelector('#tm-trash').addEventListener('click',()=>{closePop();openTrash(activeT);});
+    const tmDel=p.querySelector('#tm-del');
+    if(tmDel)tmDel.addEventListener('click',()=>{closePop();deleteTable(activeT);});
+  }
+  if(kind==='export'){
+    const p=popupAt(anchor,`
+      <button class="mrow" id="ex-csv">Скачать этот вид (CSV)</button>
+      <button class="mrow" id="ex-json">Скачать всю базу (JSON)</button>
+      <div class="sec hint">CSV открывается в Excel/Numbers. JSON — полная резервная копия всех таблиц.</div>`);
+    p.querySelector('#ex-csv').addEventListener('click',()=>{closePop();exportCSV();});
+    p.querySelector('#ex-json').addEventListener('click',()=>{closePop();exportJSON();});
+  }
+}
+async function renameTable(){
+  if(role!=='admin'){toast('Переименовывать таблицы может только админ');return;}
+  const t=tables[activeT];const n=prompt('Название таблицы:',t.name);
+  if(!n||!n.trim()||n.trim()===t.name)return;
+  try{await db.doc('tables/'+activeT).update({name:n.trim()});logAction(`таблица «${t.name}» переименована в «${n.trim()}»`);}
+  catch(e){toast('Не переименовалось: '+(e&&e.code||''));}
+}
+function renameView(){
+  if(role!=='admin'){toast('Переименовывать виды может только админ');return;}
+  const v=views[activeV];const n=prompt('Название вида:',v.name);
+  if(n&&n.trim()&&n.trim()!==v.name){saveView(activeV,{name:n.trim()});}
+}
+async function exportCSV(){
+  if(!downloads){toast('Скачивание недоступно в этом окне');return;}
+  const t=tables[activeT];const v=views[activeV]||{hidden:[]};
+  const cols=colsArr(t).filter(c=>!(v.hidden||[]).includes(c.id));
+  const rows=visibleRows();
+  const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
+  let csv='﻿'+cols.map(c=>q(c.name)).join(';')+'\n';
+  for(const r of rows)csv+=cols.map(c=>{
+    const val=(r.c||{})[c.id];
+    if(c.type==='card'&&val)return q(`${val.n||''} ${val.exp||''} ${val.cvv||''}`.trim());
+    return q(cellText(c,val));
+  }).join(';')+'\n';
+  try{await downloads.save({filename:`${t.name}.csv`,data:csv});}catch(e){if(e&&e.code!=='cancelled')toast('Не скачалось: '+(e.code||''));}
+}
+async function exportJSON(){
+  if(!downloads){toast('Скачивание недоступно в этом окне');return;}
+  const dump={exportedAt:nowISO(),tables:{}};
+  for(const t of tablesArr())dump.tables[t.id]={name:t.name,cols:t.cols,rows:rowsByTable[t.id]||{}};
+  try{await downloads.save({filename:'traffbraza-base-backup.json',data:JSON.stringify(dump,null,1)});}
+  catch(e){if(e&&e.code!=='cancelled')toast('Не скачалось: '+(e.code||''));}
+}
+
+/* ============ корзина ============ */
+function openTrash(tid){
+  cardOpen=null;
+  const t=tables[tid];if(!t)return;
+  const list=trashArr(tid);
+  const o=$('#overlay');o.hidden=false;
+  o.innerHTML=`<div class="veil" data-close="1"></div><div class="drawer">
+    <button class="close" data-close="1">✕</button>
+    <div class="dr-kind">Корзина · ${esc(t.name)}</div>
+    <div class="dr-name">Удалённые записи</div>
+    <p class="hint" style="margin:0 0 14px">Запись из корзины можно вернуть в один клик. «Насовсем» — сотрёт запись, копия содержимого останется в логе действий.</p>
+    ${list.length?list.map(r=>`<div class="relrow" style="cursor:default"><div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(rowTitle(tid,r.id).replace('🗑 ',''))}</div>
+      <button class="mini" data-tr-rest="${r.id}">Вернуть</button>
+      <button class="mini" data-tr-purge="${r.id}" style="color:var(--c-red)">Насовсем</button></div>`).join(''):'<div class="empty">Корзина пуста</div>'}
+  </div>`;
+  o.querySelectorAll('[data-tr-rest]').forEach(b=>b.addEventListener('click',async()=>{await restoreRow(tid,b.dataset.trRest);openTrash(tid);}));
+  o.querySelectorAll('[data-tr-purge]').forEach(b=>b.addEventListener('click',async()=>{await purgeRow(tid,b.dataset.trPurge);openTrash(tid);}));
+}
+
+/* ============ карточка записи ============ */
+function closeDrawer(){cardOpen=null;const o=$('#overlay');o.hidden=true;o.innerHTML='';}
+$('#overlay').addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeDrawer();});
+function openRowCard(tid,ridv){
+  const t=tables[tid];const row=(rowsByTable[tid]||{})[ridv];
+  if(!t||!row){closeDrawer();return;}
+  cardOpen={tid,ridv};
+  const cols=colsArr(t);
+  // обратные ссылки: кто ссылается на эту запись
+  const backs=[];
+  for(const ot of tablesArr()){
+    for(const oc of colsArr(ot)){
+      if(oc.type==='link'&&(oc.opts||{}).table===tid){
+        for(const orow of rowsArr(ot.id)){
+          const v=(orow.c||{})[oc.id];
+          if(Array.isArray(v)&&v.includes(ridv))backs.push({t:ot,row:orow,via:oc.name});
+        }
+      }
+    }
+  }
+  // история из лога
+  const hist=[];
+  for(const[,doc] of Object.entries(logDocs))for(const it of (doc.items||[]))if(it.row===ridv)hist.push(it);
+  hist.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const o=$('#overlay');o.hidden=false;
+  o.innerHTML=`<div class="veil" data-close="1"></div><div class="drawer">
+    <button class="close" data-close="1">✕</button>
+    <div class="dr-kind">${esc(t.name)}</div>
+    <div class="dr-name">${esc(rowTitle(tid,ridv))}</div>
+    ${cols.map(c=>`<div class="fld"><div class="fl">${esc(c.name)}</div><div class="fv" data-fldedit="${c.id}">${renderCellHTML(c,(row.c||{})[c.id])||'<span class="dim">—</span>'}</div></div>`).join('')}
+    <div class="sect"><h3>Сюда ссылаются</h3>
+      ${backs.length?backs.map((b,i)=>`<div class="relrow" data-goback="${b.t.id}:${b.row.id}"><span class="dim" style="font-size:11px">${esc(b.t.name)}</span><b>${esc(rowTitle(b.t.id,b.row.id))}</b><span class="dim" style="margin-left:auto;font-size:11px">через «${esc(b.via)}»</span></div>`).join(''):'<div class="hint">Пока никто не ссылается.</div>'}
+    </div>
+    ${role==='admin'?`<div class="sect"><h3>История изменений</h3>
+      ${hist.length?hist.slice(0,25).map(it=>`<div class="ev"><span class="d">${esc(fmtDT(it.at))}</span><div><span class="who">${esc(it.by)}</span> · ${esc(it.text)}</div></div>`).join(''):'<div class="hint">Изменений после переезда не было (историю загружает экран «Лог действий»).</div>'}
+    </div>`:''}
+    ${canEdit()?'<div class="btnrow" style="padding:16px 0 0"><button class="btn ghost" id="dr-del" style="color:var(--c-red)">Удалить запись</button></div>':''}
+  </div>`;
+  o.querySelectorAll('[data-fldedit]').forEach(f=>f.addEventListener('click',()=>{
+    const col=cols.find(c=>c.id===f.dataset.fldedit);
+    if(!canEdit()&&col.type!=='card')return;
+    if(col.type==='card'&&(row.c||{})[col.id]){
+      const c=(row.c||{})[col.id];
+      if(!f.dataset.shown){f.innerHTML=`<span class="mono">${esc(c.n||'')}${c.exp?' '+esc(c.exp):''}${c.cvv?' · CVV '+esc(c.cvv):''}</span>`;f.dataset.shown='1';return;}
+      f.dataset.shown='';
+      if(!canEdit())return;
+    }
+    if(!canEdit())return;
+    openCellEditor(f,tid,ridv,col);
+  }));
+  o.querySelectorAll('[data-goback]').forEach(r=>r.addEventListener('click',()=>{const[ot,orid]=r.dataset.goback.split(':');openRowCard(ot,orid);}));
+  const drDel=o.querySelector('#dr-del');
+  if(drDel)drDel.addEventListener('click',async()=>{closeDrawer();await deleteRow(tid,ridv);});
+}
+
+/* ============ байеры ============ */
+let buyerSel=null;
+const TGRE=/@[a-z0-9_]{3,}/gi;
+function buyerKeyOf(s){
+  const m=String(s).toLowerCase().match(TGRE);
+  return (m&&m.length)?m[m.length-1]:String(s).trim().toLowerCase().replace(/\s+/g,' ');
+}
+function buyersRegistry(){
+  const reg={};
+  for(const r of rowsArr('t_acc')){
+    const raw=String((r.c||{}).c_buyer||'');
+    for(const part of raw.split(/[,;]/).map(s=>s.trim().replace(/\s+/g,' ')).filter(Boolean)){
+      const k=buyerKeyOf(part);if(!k)continue;
+      const b=reg[k]||(reg[k]={key:k,forms:[],accs:[]});
+      if(!b.forms.includes(part))b.forms.push(part);
+      if(!b.accs.includes(r.id))b.accs.push(r.id);
+    }
+  }
+  return reg;
+}
+function buyerDisplay(b){return b.forms.slice().sort((a,c)=>c.length-a.length)[0]||b.key;}
+function buyerAssets(accRids){
+  const groups={};
+  for(const ot of tablesArr()){
+    if(ot.id==='t_acc')continue;
+    const linkCols=colsArr(ot).filter(c=>c.type==='link'&&(c.opts||{}).table==='t_acc');
+    if(!linkCols.length)continue;
+    for(const orow of rowsArr(ot.id)){
+      const hit=linkCols.some(oc=>{const v=(orow.c||{})[oc.id];return Array.isArray(v)&&v.some(x=>accRids.includes(x));});
+      if(hit){const g=groups[ot.id]||(groups[ot.id]={t:ot,rows:[]});if(!g.rows.some(x=>x.id===orow.id))g.rows.push(orow);}
+    }
+  }
+  return groups;
+}
+function buyerMentions(key){
+  const out=[];
+  for(const t of tablesArr()){
+    for(const r of rowsArr(t.id)){
+      for(const c of colsArr(t)){
+        if(c.type!=='text'&&c.type!=='longtext')continue;
+        if(t.id==='t_acc'&&c.id==='c_buyer')continue;
+        const v=(r.c||{})[c.id];
+        if(v!=null&&String(v).toLowerCase().includes(key)){out.push({t,r,c,txt:String(v)});break;}
+      }
+    }
+  }
+  return out;
+}
+function renderBuyers(){
+  const reg=buyersRegistry();
+  const list=Object.values(reg).sort((a,b)=>b.accs.length-a.accs.length);
+  const cards=list.map(b=>{
+    const assets=buyerAssets(b.accs);
+    const parts=Object.values(assets).map(g=>`${g.rows.length} ${esc(g.t.name)}`).join(' · ');
+    return `<div class="tile" data-buyer="${esc(b.key)}" style="cursor:pointer">
+      <div class="n" style="font-size:16px;font-family:var(--ui);font-weight:800;word-break:break-all">${esc(buyerDisplay(b))}</div>
+      <div class="l">${b.accs.length} аккаунт(ов)${parts?' · '+parts:''}</div></div>`;
+  }).join('');
+  $('#main').innerHTML=`<div class="logscreen" data-screen="buyers">
+    <h1>Байеры</h1>
+    <p class="hint" style="max-width:70ch;margin:0 0 14px">Список собирается сам из колонки «Байер» в «Аккаунтах». Впиши байеру ник в аккаунте — он появится здесь; клик по карточке покажет всё его хозяйство.</p>
+    <div class="tiles">${cards||'<div class="empty">Пока ни у одного аккаунта не заполнена колонка «Байер»</div>'}</div>
+  </div>`;
+}
+function renderBuyerCard(){
+  const reg=buyersRegistry();
+  const b=reg[buyerSel];
+  if(!b){screen='buyers';renderBuyers();return;}
+  const assets=buyerAssets(b.accs);
+  const mentions=buyerMentions(b.key);
+  const accRows=b.accs.map(rid=>({rid,title:rowTitle('t_acc',rid)}));
+  const accT=tables['t_acc'];
+  const stCol=accT&&(accT.cols||{}).c_status?{id:'c_status',...(accT.cols||{}).c_status}:null;
+  const accList=accRows.map(a=>{
+    const row=(rowsByTable['t_acc']||{})[a.rid]||{};
+    const ch=stCol?choiceOf(stCol,(row.c||{})[stCol.id]):null;
+    return `<div class="relrow" data-gorow="t_acc:${a.rid}"><b>${esc(a.title)}</b>${ch?`<span class="pill" style="margin-left:auto;background:var(--cs-${safeColor(ch.color)});color:var(--c-${safeColor(ch.color)})">${esc(ch.label)}</span>`:''}</div>`;
+  }).join('');
+  const assetBlocks=Object.values(assets).map(g=>`
+    <div class="an-panel"><h3>${esc(g.t.name)} <span class="src-note">${g.rows.length}</span></h3>
+      ${g.rows.slice(0,80).map(r=>`<div class="relrow" data-gorow="${g.t.id}:${r.id}"><span class="mono" style="overflow:hidden;text-overflow:ellipsis">${esc(rowTitle(g.t.id,r.id))}</span></div>`).join('')}
+      ${g.rows.length>80?`<div class="hint">и ещё ${g.rows.length-80}…</div>`:''}
+    </div>`).join('');
+  $('#main').innerHTML=`<div class="logscreen" data-screen="buyer">
+    <button class="tbtn" data-act="buyers" style="margin-bottom:12px">← Все байеры</button>
+    <h1 style="word-break:break-all">${esc(buyerDisplay(b))}</h1>
+    <p class="hint" style="margin:0 0 4px">${b.forms.length>1?'Встречается в базе как: '+b.forms.map(esc).join(' · '):''}</p>
+    <div class="tiles" style="margin:12px 0 16px">
+      <div class="tile"><div class="n">${b.accs.length}</div><div class="l">аккаунтов</div></div>
+      ${Object.values(assets).map(g=>`<div class="tile"><div class="n">${g.rows.length}</div><div class="l">${esc(g.t.name)}</div></div>`).join('')}
+      <div class="tile"><div class="n">${mentions.length}</div><div class="l">упоминаний в текстах</div></div>
+    </div>
+    <div class="an-grid">
+      <div class="an-panel"><h3>Аккаунты байера</h3>${accList||'<div class="hint">Нет</div>'}</div>
+      ${assetBlocks}
+      <div class="an-panel"><h3>Упоминания ника в текстах</h3>
+        ${mentions.length?mentions.slice(0,40).map(m=>`<div class="relrow" data-gorow="${m.t.id}:${m.r.id}"><div style="min-width:0"><div class="src-note">${esc(m.t.name)} · ${esc(m.c.name)}</div><div style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.txt.slice(0,90))}</div></div></div>`).join(''):'<div class="hint">Не найдено</div>'}
+      </div>
+    </div>
+  </div>`;
+  document.querySelectorAll('[data-gorow]').forEach(el2=>el2.addEventListener('click',()=>{
+    const[tid,ridv]=el2.dataset.gorow.split(':');
+    (role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard(tid,ridv));
+  }));
+}
+
+/* ============ дашборд аккаунта (главный экран: всё по аккаунту, ассеты — его разделы) ============ */
+let accSel=null;
+const ACC_ASSET_ORDER=['t_ads','t_bm','t_fp','t_pixel','t_card','t_soc','t_log'];
+const ACC_CRED_IDS=new Set(['c_login','c_fbpass','c_2fa','c_mailpass','c_backup','c_recovery_site','c_recovery_pass']);
+function accountAssets(rid){
+  const groups={};
+  for(const ot of tablesArr()){
+    if(ot.id==='t_acc')continue;
+    const linkCols=colsArr(ot).filter(c=>c.type==='link'&&(c.opts||{}).table==='t_acc');
+    if(!linkCols.length)continue;
+    for(const orow of rowsArr(ot.id)){
+      const hit=linkCols.some(oc=>{const v=(orow.c||{})[oc.id];return Array.isArray(v)&&v.includes(rid);});
+      if(hit){const g=groups[ot.id]||(groups[ot.id]={t:ot,rows:[]});if(!g.rows.some(x=>x.id===orow.id))g.rows.push(orow);}
+    }
+  }
+  return groups;
+}
+function fldHTML(c,v){
+  const disp=renderCellHTML(c,v);
+  if(disp==null||disp===''||disp==='<span class="dim"></span>')return'';
+  return `<div class="fld"><div class="fl">${esc(c.name)}</div><div class="fv" style="cursor:default">${disp}</div></div>`;
+}
+function renderAccountCard(){
+  const rid=accSel;const t=tables['t_acc'];const row=(rowsByTable['t_acc']||{})[rid];
+  if(!t||!row){screen='grid';render();return;}
+  const cols=colsArr(t);
+  const assets=accountAssets(rid);
+  const stCol=(t.cols||{}).c_status?{id:'c_status',...(t.cols||{}).c_status}:null;
+  const ch=stCol?choiceOf(stCol,(row.c||{}).c_status):null;
+  const mainFlds=cols.filter(c=>c.id!=='c_name'&&!ACC_CRED_IDS.has(c.id)).map(c=>fldHTML(c,(row.c||{})[c.id])).filter(Boolean).join('');
+  const credFlds=cols.filter(c=>ACC_CRED_IDS.has(c.id)).map(c=>fldHTML(c,(row.c||{})[c.id])).filter(Boolean).join('');
+  const gkeys=Object.keys(assets).sort((a,b)=>{const ia=ACC_ASSET_ORDER.indexOf(a),ib=ACC_ASSET_ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
+  const assetBlocks=gkeys.map(gid=>{
+    const g=assets[gid];const gcols=colsArr(g.t).filter(c=>c.type!=='link');
+    const cards=g.rows.map(r=>{
+      const kv=gcols.map(c=>{const d=renderCellHTML(c,(r.c||{})[c.id]);
+        return (d==null||d===''||d==='<span class="dim"></span>')?'':`<div class="kv"><span class="kvk">${esc(c.name)}</span><span class="kvv">${d}</span></div>`;}).filter(Boolean).join('');
+      return `<div class="assetcard" data-gorow="${g.t.id}:${r.id}">${kv||'<span class="dim">—</span>'}</div>`;
+    }).join('');
+    return `<div class="an-panel"><h3>${esc(g.t.name)} <span class="src-note">${g.rows.length}</span></h3>${cards}</div>`;
+  }).join('');
+  const tilesH=gkeys.map(gid=>`<div class="tile"><div class="n">${assets[gid].rows.length}</div><div class="l">${esc(assets[gid].t.name)}</div></div>`).join('');
+  const pill=ch?`<span class="pill" style="background:var(--cs-${safeColor(ch.color)});color:var(--c-${safeColor(ch.color)});font-size:13px;vertical-align:middle;margin-left:10px">${esc(ch.label)}</span>`:'';
+  $('#main').innerHTML=`<div class="logscreen" data-screen="account">
+    <button class="tbtn" data-act="acctback" style="margin-bottom:12px">← Аккаунты</button>
+    <h1 style="word-break:break-word">${esc(rowTitle('t_acc',rid))}${pill}</h1>
+    <p class="hint" style="margin:0 0 12px">Всё по этому аккаунту на одном экране. БМ / ФП / Лички / Пиксели ниже — это его разделы (клик по карточке откроет полную запись).</p>
+    <div class="tiles" style="margin:0 0 16px">${tilesH||'<div class="tile"><div class="n">0</div><div class="l">ассетов</div></div>'}</div>
+    <div class="an-grid">
+      <div class="an-panel"><h3>Данные аккаунта</h3>${mainFlds||'<div class="hint">Пусто</div>'}
+        ${canEdit()?`<div class="btnrow" style="padding:8px 0 0"><button class="btn ghost" data-act="acctedit">Редактировать / удалить</button></div>`:''}</div>
+      ${credFlds?`<div class="an-panel"><h3>Доступы и пароли</h3>${credFlds}</div>`:''}
+      ${assetBlocks||'<div class="an-panel"><h3>Ассеты</h3><div class="hint">У этого аккаунта пока нет БМ / ФП / личек / пикселей в базе. Появятся здесь после сбора аккаунтов с ассетами.</div></div>'}
+    </div>
+  </div>`;
+  $('#main').querySelectorAll('[data-gorow]').forEach(el2=>el2.addEventListener('click',()=>{
+    const[tid,ridv]=el2.dataset.gorow.split(':');(role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard(tid,ridv));}));
+  const bk=$('#main').querySelector('[data-act="acctback"]');if(bk)bk.addEventListener('click',()=>{screen='grid';render();});
+  const ed=$('#main').querySelector('[data-act="acctedit"]');if(ed)ed.addEventListener('click',()=>{(role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard('t_acc',rid));});
+}
+
+/* ============ аналитика (только админ) ============ */
+function barListHTML(items,colorFn){
+  const max=Math.max(1,...items.map(i=>i.value));
+  return items.map(i=>`<div class="blrow" title="${esc(i.label)}: ${i.value}">
+    <span class="lbl">${esc(i.label)}</span>
+    <span class="track"><span class="fill" style="width:${Math.round(i.value/max*100)}%;background:${colorFn?colorFn(i):'var(--accent)'}"></span></span>
+    <span class="val">${i.value}</span></div>`).join('')||'<div class="hint">Нет данных</div>';
+}
+function colBarsSVG(items){
+  if(!items.length)return '<div class="hint">Нет данных</div>';
+  const n=items.length,bw=22,gap=8,padL=6,padB=26,padT=16;
+  const W=padL*2+n*(bw+gap),H=150;
+  const labelEvery=n>16?3:1;
+  const max=Math.max(1,...items.map(i=>i.value));
+  let s=`<svg class="an-svg" style="max-width:${W*1.6}px" viewBox="0 0 ${W} ${H+padB+padT}" xmlns="http://www.w3.org/2000/svg" role="img">`;
+  s+=`<line x1="0" y1="${H+padT}" x2="${W}" y2="${H+padT}" stroke="var(--line)" stroke-width="1"/>`;
+  items.forEach((it,i)=>{
+    const h=Math.max(2,Math.round(it.value/max*(H-6)));
+    const x=padL+i*(bw+gap),y=H+padT-h;
+    s+=`<g><title>${esc(it.label)}: ${it.value}</title>`;
+    s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="3" fill="var(--accent)"/>`;
+    s+=`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono,monospace" fill="var(--muted)">${it.value}</text>`;
+    s+=(i%labelEvery===0)?`<text x="${x+bw/2}" y="${H+padT+14}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${esc(it.label)}</text></g>`:'</g>';
+  });
+  return s+'</svg>';
+}
+async function renderAnalytics(){
+  if(role!=='admin'){screen='grid';render();return;}
+  $('#main').innerHTML='<div class="loading">Собираю аналитику…</div>';
+  await loadAllLogs();
+  const accT=tables['t_acc'];
+  const acc=rowsArr('t_acc'),farm=acc.filter(r=>(r.c||{}).c_src==='farm');
+  const warm=farm.filter(r=>(r.c||{}).c_warm).length;
+  const stChoices=(((accT||{}).cols||{}).c_status?.opts?.choices)||[];
+  const stCount=stChoices.map(ch=>({label:ch.label,color:`var(--c-${safeColor(ch.color)})`,value:farm.filter(r=>(r.c||{}).c_status===ch.id).length})).filter(x=>x.value>0);
+  const noStatus=farm.length-stCount.reduce((s,x)=>s+x.value,0);
+  if(noStatus>0)stCount.push({label:'без статуса',color:'var(--c-gray)',value:noStatus});
+  const vertChoices=(((accT||{}).cols||{}).c_vert?.opts?.choices)||[];
+  const vertCount=vertChoices.map(ch=>({label:ch.label,color:`var(--c-${safeColor(ch.color)})`,value:farm.filter(r=>(r.c||{}).c_vert===ch.id).length})).filter(x=>x.value>0);
+  const buyers={};
+  farm.forEach(r=>String((r.c||{}).c_buyer||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(b=>buyers[b]=(buyers[b]||0)+1));
+  const topBuyers=Object.entries(buyers).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value).slice(0,8);
+  // раздача ФП по месяцам
+  const mon={};
+  rowsArr('t_log').forEach(r=>{const d=String((r.c||{}).c_date||'');if(/^\d{4}-\d{2}/.test(d)){const k=d.slice(0,7);mon[k]=(mon[k]||0)+1;}});
+  const monItems=Object.keys(mon).sort().slice(-12).map(k=>({label:k.slice(5)+'.'+k.slice(2,4),value:mon[k]}));
+  // активность за 30 дней
+  const act={};
+  for(const[,doc] of Object.entries(logDocs))for(const it of(doc.items||[])){const d=String(it.at||'').slice(0,10);if(d)act[d]=(act[d]||0)+1;}
+  const days=[];
+  for(let i=29;i>=0;i--){const d=new Date(Date.now()-i*864e5).toISOString().slice(0,10);days.push({label:d.slice(8),value:act[d]||0});}
+  const actTotal=days.reduce((s,d)=>s+d.value,0);
+  // объём базы
+  let docsUsed=Object.keys(tables).length+Object.keys(views).length+Object.keys(logDocs).length;
+  for(const tid of Object.keys(rowsByTable))docsUsed+=Object.keys(rowsByTable[tid]).length;
+  const cnt=t=>rowsArr(t).length;
+  $('#main').innerHTML=`<div class="logscreen" data-screen="an">
+    <h1>Аналитика</h1>
+    <p class="hint" style="margin:0 0 14px">Считается вживую по данным базы. Виден только админу.</p>
+    <div class="tiles" style="margin-bottom:16px">
+      <div class="tile"><div class="n">${farm.length}</div><div class="l">аккаунтов в фарме</div></div>
+      <div class="tile ok"><div class="n">${warm}</div><div class="l">прогрето (${farm.length?Math.round(warm/farm.length*100):0}%)</div></div>
+      <div class="tile ${stCount.find(s=>/чекпоинт|checkpoint/i.test(s.label)&&s.value)?'bad':''}"><div class="n">${(stCount.find(s=>/чекпоинт|checkpoint/i.test(s.label))||{}).value||0}</div><div class="l">в чекпоинте</div></div>
+      <div class="tile"><div class="n">${cnt('t_bm')}</div><div class="l">БМов</div></div>
+      <div class="tile"><div class="n">${cnt('t_ads')}</div><div class="l">личек</div></div>
+      <div class="tile"><div class="n">${cnt('t_card')}</div><div class="l">карт</div></div>
+      <div class="tile"><div class="n">${cnt('t_fp')}</div><div class="l">ФП</div></div>
+      <div class="tile"><div class="n">${actTotal}</div><div class="l">действий за 30 дней</div></div>
+    </div>
+    <div class="an-grid">
+      <div class="an-panel"><h3>Аккаунты по статусам</h3>${barListHTML(stCount,i=>i.color)}</div>
+      <div class="an-panel"><h3>По вертикалям</h3>${barListHTML(vertCount,i=>i.color)}</div>
+      <div class="an-panel"><h3>Кому переданы (байеры)</h3>${barListHTML(topBuyers)}</div>
+      <div class="an-panel"><h3>Раздача ФП по месяцам</h3>${colBarsSVG(monItems)}</div>
+      <div class="an-panel"><h3>Активность в базе, 30 дней</h3>${colBarsSVG(days)}</div>
+      <div class="an-panel"><h3>Хранилище</h3>
+        <div class="blrow"><span class="lbl">Занято документов</span><span class="track"><span class="fill" style="width:${Math.min(100,Math.round(docsUsed/5000*100))}%;background:var(--accent)"></span></span><span class="val">${docsUsed}</span></div>
+        <div class="hint">из 5000 доступных (без учёта архивных таблиц и служебных записей). Когда перевалит за 4000 — попроси меня почистить старые логи.</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============ лог-экран ============ */
+async function loadAllLogs(){
+  try{
+    const snap=await db.collection('log').get();
+    snap.docs.forEach(d=>{if(d.exists)logDocs[('log/'+d.id)]=d.data();});
+  }catch(e){}
+}
+async function renderLog(){
+  if(role!=='admin'){screen='grid';render();return;}
+  $('#main').innerHTML='<div class="loading">Загружаю лог…</div>';
+  await loadAllLogs();
+  const items=[];
+  for(const[,doc] of Object.entries(logDocs))items.push(...(doc.items||[]));
+  items.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  $('#main').innerHTML=`<div class="logscreen" data-screen="log">
+    <h1>Лог действий</h1>
+    <p class="hint" style="max-width:70ch;margin:0 0 14px">Каждое изменение записывается сюда автоматически: кто, когда и что поменял. Удалённые значения тоже остаются здесь — ничего не пропадает бесследно.</p>
+    <input type="text" id="lq" placeholder="Фильтр по тексту…" style="border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:7px 12px;min-width:280px;margin-bottom:12px">
+    <div id="litems">${items.slice(0,600).map(it=>`<div class="ev"><span class="d">${esc(fmtDT(it.at))}</span><div><span class="who">${esc(it.by)}</span> · ${it.table&&tables[it.table]?`<b>${esc(tables[it.table].name)}</b> · `:''}${esc(it.text)}</div></div>`).join('')||'<div class="empty">Пока пусто — начни менять данные, и тут появится история.</div>'}</div>
+  </div>`;
+  const lq=$('#lq');
+  lq.addEventListener('input',debounce(()=>{
+    const q=lq.value.toLowerCase();
+    $('#litems').innerHTML=items.filter(it=>!q||it.text.toLowerCase().includes(q)||String(it.by).toLowerCase().includes(q)).slice(0,600)
+      .map(it=>`<div class="ev"><span class="d">${esc(fmtDT(it.at))}</span><div><span class="who">${esc(it.by)}</span> · ${it.table&&tables[it.table]?`<b>${esc(tables[it.table].name)}</b> · `:''}${esc(it.text)}</div></div>`).join('')||'<div class="empty">Ничего не найдено</div>';
+  },200));
+}
+
+/* ============ глобальный поиск ============ */
+$('#gs').addEventListener('input',debounce(()=>{
+  const q=$('#gs').value.trim().toLowerCase();
+  const d=$('#gsdrop');
+  if(q.length<2){d.hidden=true;return;}
+  const hits=[];
+  if(canEdit()){
+    const reg=buyersRegistry();
+    for(const b of Object.values(reg)){
+      if(b.key.includes(q)||b.forms.some(f=>f.toLowerCase().includes(q)))
+        hits.push({buyer:b.key,title:buyerDisplay(b),tname:'Байер',cname:'аккаунтов: '+b.accs.length,txt:''});
+      if(hits.length>=5)break;
+    }
+  }
+  for(const t of tablesArr()){
+    for(const r of rowsArr(t.id)){
+      if(hits.length>=30)break;
+      const cols=colsArr(t);
+      for(const c of cols){
+        const val=(r.c||{})[c.id];if(val==null)continue;
+        const txt=(c.type==='card'&&val.n)?String(val.n):cellText(c,val);
+        if(String(txt).toLowerCase().includes(q)){hits.push({t,r,c,txt:String(txt)});break;}
+      }
+    }
+  }
+  d.innerHTML=hits.map((h,i)=>h.buyer?`<div class="gs-hit" data-gbuyer="${esc(h.buyer)}"><b>${esc(h.title)}</b> <span class="t">· Байер · ${esc(h.cname)}</span></div>`:`<div class="gs-hit" data-gh="${h.t.id}:${h.r.id}"><b>${esc(rowTitle(h.t.id,h.r.id))}</b> <span class="t">· ${esc(h.t.name)} · ${esc(h.c.name)}: ${esc(h.txt.slice(0,60))}</span></div>`).join('')||'<div class="empty" style="padding:12px">Не найдено</div>';
+  d.hidden=false;
+},200));
+document.addEventListener('click',e=>{
+  const gh=e.target.closest('[data-gh]');
+  const gb=e.target.closest('[data-gbuyer]');
+  if(gb){$('#gsdrop').hidden=true;$('#gs').value='';buyerSel=gb.dataset.gbuyer;screen='buyer';render();window.scrollTo(0,0);return;}
+  if(gh){const[tid,ridv]=gh.dataset.gh.split(':');$('#gsdrop').hidden=true;$('#gs').value='';(role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard(tid,ridv));return;}
+  if(!e.target.closest('.gsearch'))$('#gsdrop').hidden=true;
+});
+
+/* ============ делегирование грида ============ */
+$('#main').addEventListener('click',e=>{
+  const bt=e.target.closest('[data-buyer]');
+  if(bt){buyerSel=bt.dataset.buyer;screen='buyer';render();window.scrollTo(0,0);return;}
+  const ba=e.target.closest('[data-act="buyers"]');
+  if(ba){screen='buyers';buyerSel=null;render();return;}
+  const cell=e.target.closest('[data-cell]');
+  if(cell){
+    const[ridv,cid]=cell.dataset.cell.split(':');
+    if(!canEdit()){openRowCard(activeT,ridv);return;}
+    const col={id:cid,...(tables[activeT].cols||{})[cid]};openCellEditor(cell,activeT,ridv,col);return;
+  }
+  const orow=e.target.closest('[data-openrow]');
+  if(orow){
+    if(activeT==='t_acc'){accSel=orow.dataset.openrow;screen='account';render();window.scrollTo(0,0);return;}
+    (role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard(activeT,orow.dataset.openrow));return;
+  }
+  const ar=e.target.closest('[data-addrow]');
+  if(ar){addRow(activeT);return;}
+  const ac=e.target.closest('[data-addcol]');
+  if(ac){openColForm(ac,activeT,null);return;}
+  const ch=e.target.closest('[data-colhead]');
+  if(ch){if(e.target.closest('[data-rs]'))return;if(!canEdit())return;openColForm(ch,activeT,ch.dataset.colhead);return;}
+  const tb=e.target.closest('[data-tb]');
+  if(tb){openViewPanel(tb,tb.dataset.tb==='filters'?'filters':tb.dataset.tb);return;}
+  if(e.target.closest('[data-rename-table]')){renameTable();return;}
+  if(e.target.closest('[data-rename-view]')){renameView();return;}
+});
+
+let rsState=null;
+$('#main').addEventListener('mousedown',e=>{
+  const rs=e.target.closest('[data-rs]');
+  if(rs&&canEdit()){e.preventDefault();const th=rs.closest('th');rsState={cid:rs.dataset.rs,th,startX:e.clientX,startW:th.offsetWidth,w:null};}
+});
+document.addEventListener('mousemove',e=>{
+  if(!rsState)return;
+  const w=Math.max(70,rsState.startW+(e.clientX-rsState.startX));
+  rsState.th.style.width=w+'px';rsState.th.style.minWidth=w+'px';rsState.w=w;
+});
+document.addEventListener('mouseup',()=>{
+  if(!rsState)return;
+  const st=rsState;rsState=null;
+  if(st.w&&Math.abs(st.w-st.startW)>3){
+    const col=(tables[activeT].cols||{})[st.cid];
+    if(col)patchColumn(activeT,st.cid,{opts:{...(col.opts||{}),width:st.w}},null);
+  }
+});
+
+renderWho();
+boot();
+</script>

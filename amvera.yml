@@ -1,0 +1,32 @@
+# Конфигурация деплоя на Amvera.
+#
+# Приложение — один Node-процесс: отдаёт веб-приложение из public/, обслуживает
+# его API, держит WebSocket и принимает инвентарь от расширения.
+#
+# Перед первым деплоем в панели Amvera задай переменные окружения:
+#   DATABASE_URL    строка подключения к твоему PostgreSQL в Amvera
+#   SESSION_SECRET  длинная случайная строка (подпись сессионных cookie)
+#   SYNC_SECRET     общий секрет с расширением
+#
+# Тариф: не ниже «Начальный». На «Пробном» (100 Мб памяти) клиент PostgreSQL
+# не поднимется — об этом предупреждает и документация Amvera.
+#
+# Реплика должна быть одна: живые обновления держатся на постоянных
+# WebSocket-соединениях, а закрепление клиента за репликой у Amvera
+# не документировано.
+
+meta:
+  environment: node
+  toolchain:
+    name: npm
+    version: 20
+
+build:
+  # ставим зависимости только сервера; public/ — статика, сборка ей не нужна
+  additionalCommands:
+    - cd server && npm install --omit=dev
+
+run:
+  command: node server/index.js
+  containerPort: 3000
+  persistenceMount: /data

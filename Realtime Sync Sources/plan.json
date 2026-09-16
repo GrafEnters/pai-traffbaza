@@ -1,0 +1,1219 @@
+{
+ "tables": {
+  "ad_account": {
+   "table_ru": "Лички",
+   "cols": [
+    {
+     "col_id": "c_act_id",
+     "ru_label": "ID кабинета (act_)",
+     "graph_field": "id",
+     "base_type": "id",
+     "order": 10,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_account_id",
+     "ru_label": "Номер кабинета",
+     "graph_field": "account_id",
+     "base_type": "id",
+     "order": 20,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_name",
+     "ru_label": "Название кабинета",
+     "graph_field": "name",
+     "base_type": "text",
+     "order": 30,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_acc",
+     "ru_label": "Аккаунт (VIA)",
+     "graph_field": "",
+     "base_type": "link",
+     "order": 40,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_bm",
+     "ru_label": "Бизнес-менеджер (владелец)",
+     "graph_field": "business{id,name}",
+     "base_type": "link",
+     "order": 50,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_account_status",
+     "ru_label": "Статус кабинета (код)",
+     "graph_field": "account_status",
+     "base_type": "number",
+     "order": 60,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_disable_reason",
+     "ru_label": "Причина отключения (код)",
+     "graph_field": "disable_reason",
+     "base_type": "number",
+     "order": 70,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_currency",
+     "ru_label": "Валюта",
+     "graph_field": "currency",
+     "base_type": "text",
+     "order": 80,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_amount_spent",
+     "ru_label": "Потрачено, $ (в центах)",
+     "graph_field": "amount_spent",
+     "base_type": "number",
+     "order": 90,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_spend_cap",
+     "ru_label": "Лимит трат, $ (в центах)",
+     "graph_field": "spend_cap",
+     "base_type": "number",
+     "order": 100,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_balance",
+     "ru_label": "Задолженность, $ (в центах)",
+     "graph_field": "balance",
+     "base_type": "number",
+     "order": 110,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_created_time",
+     "ru_label": "Дата создания",
+     "graph_field": "created_time",
+     "base_type": "date",
+     "order": 120,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_age",
+     "ru_label": "Возраст, дней",
+     "graph_field": "age",
+     "base_type": "number",
+     "order": 130,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_timezone_name",
+     "ru_label": "Часовой пояс",
+     "graph_field": "timezone_name",
+     "base_type": "text",
+     "order": 140,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_is_prepay",
+     "ru_label": "Предоплатный?",
+     "graph_field": "is_prepay_account",
+     "base_type": "checkbox",
+     "order": 150,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_funding_details",
+     "ru_label": "Способ оплаты (напр. Visa *1234)",
+     "graph_field": "funding_source_details{id,display_string,type}",
+     "base_type": "longtext",
+     "order": 160,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_user_tasks",
+     "ru_label": "Мои права на кабинет",
+     "graph_field": "user_tasks",
+     "base_type": "longtext",
+     "order": 170,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_capabilities",
+     "ru_label": "Возможности кабинета",
+     "graph_field": "capabilities",
+     "base_type": "longtext",
+     "order": 180,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_min_daily_budget",
+     "ru_label": "Мин. дневной бюджет, $ (в центах)",
+     "graph_field": "min_daily_budget",
+     "base_type": "number",
+     "order": 190,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_min_camp_spend_cap",
+     "ru_label": "Мин. лимит кампании, $ (в центах)",
+     "graph_field": "min_campaign_group_spend_cap",
+     "base_type": "number",
+     "order": 200,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_is_personal",
+     "ru_label": "Личный (не бизнес)?",
+     "graph_field": "is_personal",
+     "base_type": "number",
+     "order": 210,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_name",
+     "ru_label": "Юр. название бизнеса",
+     "graph_field": "business_name",
+     "base_type": "text",
+     "order": 220,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_country",
+     "ru_label": "Страна бизнеса",
+     "graph_field": "business_country_code",
+     "base_type": "text",
+     "order": 230,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_city",
+     "ru_label": "Город бизнеса",
+     "graph_field": "business_city",
+     "base_type": "text",
+     "order": 240,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_state",
+     "ru_label": "Штат/регион бизнеса",
+     "graph_field": "business_state",
+     "base_type": "text",
+     "order": 250,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_zip",
+     "ru_label": "Индекс бизнеса",
+     "graph_field": "business_zip",
+     "base_type": "text",
+     "order": 260,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_street",
+     "ru_label": "Адрес бизнеса",
+     "graph_field": "business_street",
+     "base_type": "text",
+     "order": 270,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_biz_street2",
+     "ru_label": "Адрес бизнеса (стр. 2)",
+     "graph_field": "business_street2",
+     "base_type": "text",
+     "order": 280,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_opportunity_score",
+     "ru_label": "Opportunity score (0-100)",
+     "graph_field": "opportunity_score",
+     "base_type": "number",
+     "order": 290,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_tax_id",
+     "ru_label": "Налоговый ID",
+     "graph_field": "tax_id",
+     "base_type": "text",
+     "order": 300,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_tax_id_status",
+     "ru_label": "Статус НДС/налога (код)",
+     "graph_field": "tax_id_status",
+     "base_type": "number",
+     "order": 310,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_tax_id_type",
+     "ru_label": "Тип налог. ID",
+     "graph_field": "tax_id_type",
+     "base_type": "text",
+     "order": 320,
+     "risk": "needs_perm",
+     "smit_shown": false
+    }
+   ]
+  },
+  "business": {
+   "table_ru": "БМы",
+   "cols": [
+    {
+     "col_id": "c_bm_id",
+     "ru_label": "ID бизнес-менеджера",
+     "graph_field": "id",
+     "base_type": "id",
+     "order": 10,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_bm_name",
+     "ru_label": "Название БМ",
+     "graph_field": "name",
+     "base_type": "text",
+     "order": 20,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_acc",
+     "ru_label": "Аккаунт (VIA)",
+     "graph_field": "",
+     "base_type": "link",
+     "order": 30,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_verif_status",
+     "ru_label": "Статус верификации БМ",
+     "graph_field": "verification_status",
+     "base_type": "text",
+     "order": 40,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_two_factor",
+     "ru_label": "Требование 2FA в БМ",
+     "graph_field": "two_factor_type",
+     "base_type": "text",
+     "order": 50,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_created_time",
+     "ru_label": "Дата создания БМ",
+     "graph_field": "created_time",
+     "base_type": "date",
+     "order": 60,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_updated_time",
+     "ru_label": "Последнее изменение",
+     "graph_field": "updated_time",
+     "base_type": "date",
+     "order": 70,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_primary_page",
+     "ru_label": "Основная страница БМ",
+     "graph_field": "primary_page{id,name}",
+     "base_type": "text",
+     "order": 80,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_is_hidden",
+     "ru_label": "БМ скрыт",
+     "graph_field": "is_hidden",
+     "base_type": "checkbox",
+     "order": 90,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_link",
+     "ru_label": "Ссылка на БМ",
+     "graph_field": "link",
+     "base_type": "link",
+     "order": 100,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_profile_pic",
+     "ru_label": "Аватар БМ (ссылка)",
+     "graph_field": "profile_picture_uri",
+     "base_type": "link",
+     "order": 110,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_owned_adaccounts",
+     "ru_label": "Свои рекл. кабинеты",
+     "graph_field": "owned_ad_accounts{id,account_id,name,account_status,currency,timezone_name,amount_spent,disable_reason}",
+     "base_type": "longtext",
+     "order": 120,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_client_adaccounts",
+     "ru_label": "Клиентские рекл. кабинеты",
+     "graph_field": "client_ad_accounts{id,account_id,name,account_status,currency}",
+     "base_type": "longtext",
+     "order": 130,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_owned_pages",
+     "ru_label": "Свои страницы",
+     "graph_field": "owned_pages{id,name,verification_status,fan_count}",
+     "base_type": "longtext",
+     "order": 140,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_client_pages",
+     "ru_label": "Клиентские страницы",
+     "graph_field": "client_pages{id,name}",
+     "base_type": "longtext",
+     "order": 150,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_owned_pixels",
+     "ru_label": "Пиксели БМ",
+     "graph_field": "owned_pixels{id,name}",
+     "base_type": "longtext",
+     "order": 160,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_owned_businesses",
+     "ru_label": "Дочерние БМ",
+     "graph_field": "owned_businesses{id,name,verification_status}",
+     "base_type": "longtext",
+     "order": 170,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_business_users",
+     "ru_label": "Люди в БМ (роли, email)",
+     "graph_field": "business_users{id,name,email,role}",
+     "base_type": "longtext",
+     "order": 180,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_system_users",
+     "ru_label": "Системные пользователи",
+     "graph_field": "system_users{id,name,role}",
+     "base_type": "longtext",
+     "order": 190,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_extended_credits",
+     "ru_label": "Кредитные линии, $ (в центах)",
+     "graph_field": "extendedcredits{id,legal_entity_name,max_balance,balance,is_active}",
+     "base_type": "longtext",
+     "order": 200,
+     "risk": "needs_perm",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_payment_acc",
+     "ru_label": "ID платёжного аккаунта",
+     "graph_field": "payment_account_id",
+     "base_type": "id",
+     "order": 210,
+     "risk": "needs_perm",
+     "smit_shown": false
+    }
+   ]
+  },
+  "page": {
+   "table_ru": "ФП",
+   "cols": [
+    {
+     "col_id": "c_page_id",
+     "ru_label": "ID страницы",
+     "graph_field": "id",
+     "base_type": "id",
+     "order": 10,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_name",
+     "ru_label": "Название страницы",
+     "graph_field": "name",
+     "base_type": "text",
+     "order": 20,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_username",
+     "ru_label": "Юзернейм (@)",
+     "graph_field": "username",
+     "base_type": "text",
+     "order": 30,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_acc",
+     "ru_label": "Аккаунт (VIA)",
+     "graph_field": "",
+     "base_type": "link",
+     "order": 40,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_bm",
+     "ru_label": "Бизнес-менеджер (владелец)",
+     "graph_field": "business{id,name}",
+     "base_type": "link",
+     "order": 50,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_link",
+     "ru_label": "Ссылка на страницу",
+     "graph_field": "link",
+     "base_type": "link",
+     "order": 60,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_category",
+     "ru_label": "Категория",
+     "graph_field": "category",
+     "base_type": "text",
+     "order": 70,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_category_list",
+     "ru_label": "Подкатегории",
+     "graph_field": "category_list{id,name}",
+     "base_type": "text",
+     "order": 80,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_tasks",
+     "ru_label": "Права на странице",
+     "graph_field": "tasks",
+     "base_type": "text",
+     "order": 90,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_is_published",
+     "ru_label": "Опубликована",
+     "graph_field": "is_published",
+     "base_type": "checkbox",
+     "order": 100,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_verification_status",
+     "ru_label": "Верификация",
+     "graph_field": "verification_status",
+     "base_type": "text",
+     "order": 110,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_fan_count",
+     "ru_label": "Лайки страницы",
+     "graph_field": "fan_count",
+     "base_type": "number",
+     "order": 120,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_followers_count",
+     "ru_label": "Подписчики",
+     "graph_field": "followers_count",
+     "base_type": "number",
+     "order": 130,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_talking_about_count",
+     "ru_label": "Обсуждают (за неделю)",
+     "graph_field": "talking_about_count",
+     "base_type": "number",
+     "order": 140,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_created_time",
+     "ru_label": "Дата создания",
+     "graph_field": "created_time",
+     "base_type": "date",
+     "order": 150,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_picture",
+     "ru_label": "Аватар (URL)",
+     "graph_field": "picture{url,width,height}",
+     "base_type": "text",
+     "order": 160,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_cover",
+     "ru_label": "Обложка (URL)",
+     "graph_field": "cover{source,id}",
+     "base_type": "text",
+     "order": 170,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_engagement",
+     "ru_label": "Вовлечённость",
+     "graph_field": "engagement{count,social_sentence}",
+     "base_type": "text",
+     "order": 180,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_about",
+     "ru_label": "Описание (кратко)",
+     "graph_field": "about",
+     "base_type": "longtext",
+     "order": 190,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_description",
+     "ru_label": "Описание (полное)",
+     "graph_field": "description",
+     "base_type": "longtext",
+     "order": 200,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_general_info",
+     "ru_label": "Общая информация",
+     "graph_field": "general_info",
+     "base_type": "longtext",
+     "order": 210,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_website",
+     "ru_label": "Сайт",
+     "graph_field": "website",
+     "base_type": "text",
+     "order": 220,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_phone",
+     "ru_label": "Телефон",
+     "graph_field": "phone",
+     "base_type": "text",
+     "order": 230,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_location",
+     "ru_label": "Локация",
+     "graph_field": "location{city,country,street,zip,latitude,longitude}",
+     "base_type": "text",
+     "order": 240,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_single_line_address",
+     "ru_label": "Адрес (одной строкой)",
+     "graph_field": "single_line_address",
+     "base_type": "text",
+     "order": 250,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_connected_instagram_account",
+     "ru_label": "Instagram (связанный)",
+     "graph_field": "connected_instagram_account{id,username}",
+     "base_type": "text",
+     "order": 260,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_instagram_business_account",
+     "ru_label": "Instagram бизнес",
+     "graph_field": "instagram_business_account{id,username}",
+     "base_type": "text",
+     "order": 270,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_emails",
+     "ru_label": "Emails",
+     "graph_field": "emails",
+     "base_type": "text",
+     "order": 280,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_promotion_eligible",
+     "ru_label": "Можно продвигать",
+     "graph_field": "promotion_eligible",
+     "base_type": "checkbox",
+     "order": 290,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_promotion_ineligible_reason",
+     "ru_label": "Причина запрета продвижения",
+     "graph_field": "promotion_ineligible_reason",
+     "base_type": "text",
+     "order": 300,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_new_like_count",
+     "ru_label": "Новые лайки (с прошл. входа)",
+     "graph_field": "new_like_count",
+     "base_type": "number",
+     "order": 310,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_unread_message_count",
+     "ru_label": "Непрочитанные сообщения",
+     "graph_field": "unread_message_count",
+     "base_type": "number",
+     "order": 320,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_unread_notif_count",
+     "ru_label": "Непрочит. уведомления",
+     "graph_field": "unread_notif_count",
+     "base_type": "number",
+     "order": 330,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_access_token",
+     "ru_label": "Токен страницы (секрет)",
+     "graph_field": "access_token",
+     "base_type": "text",
+     "order": 340,
+     "risk": "needs_perm",
+     "smit_shown": false
+    }
+   ]
+  },
+  "pixel": {
+   "table_ru": "Пиксели",
+   "cols": [
+    {
+     "col_id": "c_pixel_id",
+     "ru_label": "ID пикселя",
+     "graph_field": "id",
+     "base_type": "id",
+     "order": 10,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_name",
+     "ru_label": "Название",
+     "graph_field": "name",
+     "base_type": "text",
+     "order": 20,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_acc",
+     "ru_label": "Аккаунт (VIA)",
+     "graph_field": "",
+     "base_type": "link",
+     "order": 30,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_bm",
+     "ru_label": "Бизнес-владелец",
+     "graph_field": "owner_business{id,name}",
+     "base_type": "link",
+     "order": 40,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_is_unavailable",
+     "ru_label": "Недоступен",
+     "graph_field": "is_unavailable",
+     "base_type": "checkbox",
+     "order": 50,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_last_fired_time",
+     "ru_label": "Последнее срабатывание",
+     "graph_field": "last_fired_time",
+     "base_type": "date",
+     "order": 60,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_creation_time",
+     "ru_label": "Дата создания",
+     "graph_field": "creation_time",
+     "base_type": "date",
+     "order": 70,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_data_use_setting",
+     "ru_label": "Использование данных",
+     "graph_field": "data_use_setting",
+     "base_type": "text",
+     "order": 80,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_enable_automatic_matching",
+     "ru_label": "Автосопоставление вкл.",
+     "graph_field": "enable_automatic_matching",
+     "base_type": "checkbox",
+     "order": 90,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_automatic_matching_fields",
+     "ru_label": "Поля автосопоставления",
+     "graph_field": "automatic_matching_fields",
+     "base_type": "text",
+     "order": 100,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_first_party_cookie_status",
+     "ru_label": "Статус first-party cookie",
+     "graph_field": "first_party_cookie_status",
+     "base_type": "text",
+     "order": 110,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_is_created_by_business",
+     "ru_label": "Создан бизнесом",
+     "graph_field": "is_created_by_business",
+     "base_type": "checkbox",
+     "order": 120,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_has_1p_pixel_event",
+     "ru_label": "Есть 1p-события",
+     "graph_field": "has_1p_pixel_event",
+     "base_type": "checkbox",
+     "order": 130,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_is_crm",
+     "ru_label": "CRM / лидоген датасет",
+     "graph_field": "is_crm",
+     "base_type": "checkbox",
+     "order": 140,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_owner_ad_account",
+     "ru_label": "Рекл. аккаунт-владелец",
+     "graph_field": "owner_ad_account{id,name}",
+     "base_type": "text",
+     "order": 150,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_usage",
+     "ru_label": "Использование / лимиты",
+     "graph_field": "usage",
+     "base_type": "longtext",
+     "order": 160,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_event_stats",
+     "ru_label": "Статистика событий",
+     "graph_field": "event_stats",
+     "base_type": "longtext",
+     "order": 170,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_event_time_min",
+     "ru_label": "Первая запись (unix-сек)",
+     "graph_field": "event_time_min",
+     "base_type": "number",
+     "order": 180,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_event_time_max",
+     "ru_label": "Последняя запись (unix-сек)",
+     "graph_field": "event_time_max",
+     "base_type": "number",
+     "order": 190,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_valid_entries",
+     "ru_label": "Валидных записей",
+     "graph_field": "valid_entries",
+     "base_type": "number",
+     "order": 200,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_matched_entries",
+     "ru_label": "Сопоставлено записей",
+     "graph_field": "matched_entries",
+     "base_type": "number",
+     "order": 210,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_duplicate_entries",
+     "ru_label": "Дубликатов записей",
+     "graph_field": "duplicate_entries",
+     "base_type": "number",
+     "order": 220,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_match_rate_approx",
+     "ru_label": "Match rate (~%)",
+     "graph_field": "match_rate_approx",
+     "base_type": "number",
+     "order": 230,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_code",
+     "ru_label": "Код пикселя",
+     "graph_field": "code",
+     "base_type": "longtext",
+     "order": 240,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_description",
+     "ru_label": "Описание",
+     "graph_field": "description",
+     "base_type": "longtext",
+     "order": 250,
+     "risk": "safe",
+     "smit_shown": false
+    }
+   ]
+  },
+  "user_via": {
+   "table_ru": "Аккаунты (колонки VIA)",
+   "cols": [
+    {
+     "col_id": "c_via_id",
+     "ru_label": "ID профиля (VIA)",
+     "graph_field": "id",
+     "base_type": "id",
+     "order": 10,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_name",
+     "ru_label": "Имя (полное)",
+     "graph_field": "name",
+     "base_type": "text",
+     "order": 20,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_first_name",
+     "ru_label": "Имя",
+     "graph_field": "first_name",
+     "base_type": "text",
+     "order": 30,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_last_name",
+     "ru_label": "Фамилия",
+     "graph_field": "last_name",
+     "base_type": "text",
+     "order": 40,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_avatar",
+     "ru_label": "Аватар (ссылка)",
+     "graph_field": "picture{url,width,height}",
+     "base_type": "link",
+     "order": 50,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_link",
+     "ru_label": "Ссылка на профиль",
+     "graph_field": "link",
+     "base_type": "link",
+     "order": 60,
+     "risk": "may_error",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_businesses",
+     "ru_label": "Бизнес-менеджеры (BM)",
+     "graph_field": "businesses{id,name,verification_status,created_time}",
+     "base_type": "longtext",
+     "order": 70,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_adaccounts",
+     "ru_label": "Рекламные кабинеты",
+     "graph_field": "adaccounts{account_id,name,account_status,disable_reason,currency,amount_spent,spend_cap}",
+     "base_type": "longtext",
+     "order": 80,
+     "risk": "safe",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_pages",
+     "ru_label": "Страницы (роли)",
+     "graph_field": "accounts{id,name,category,tasks}",
+     "base_type": "longtext",
+     "order": 90,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_permissions",
+     "ru_label": "Выданные права токена",
+     "graph_field": "permissions{permission,status}",
+     "base_type": "longtext",
+     "order": 100,
+     "risk": "safe",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_business_users",
+     "ru_label": "Бизнес-пользователи (роли)",
+     "graph_field": "business_users{id,name,role,business}",
+     "base_type": "longtext",
+     "order": 110,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_token_for_business",
+     "ru_label": "Бизнес-ID (BSID)",
+     "graph_field": "token_for_business",
+     "base_type": "id",
+     "order": 120,
+     "risk": "may_error",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_email",
+     "ru_label": "Email профиля",
+     "graph_field": "email",
+     "base_type": "text",
+     "order": 130,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_friends_count",
+     "ru_label": "Число друзей",
+     "graph_field": "friends.summary(true){}",
+     "base_type": "number",
+     "order": 140,
+     "risk": "needs_perm",
+     "smit_shown": true
+    },
+    {
+     "col_id": "c_via_birthday",
+     "ru_label": "Дата рождения",
+     "graph_field": "birthday",
+     "base_type": "date",
+     "order": 150,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_gender",
+     "ru_label": "Пол",
+     "graph_field": "gender",
+     "base_type": "text",
+     "order": 160,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_location",
+     "ru_label": "Текущий город",
+     "graph_field": "location{id,name}",
+     "base_type": "text",
+     "order": 170,
+     "risk": "needs_perm",
+     "smit_shown": false
+    },
+    {
+     "col_id": "c_via_hometown",
+     "ru_label": "Родной город",
+     "graph_field": "hometown{id,name}",
+     "base_type": "text",
+     "order": 180,
+     "risk": "needs_perm",
+     "smit_shown": false
+    }
+   ]
+  }
+ },
+ "collect_field_strings": {
+  "ad_account": "id,account_id,name,business{id,name},account_status,disable_reason,currency,amount_spent,spend_cap,balance,created_time,age,timezone_name,is_prepay_account,funding_source_details{id,display_string,type},user_tasks,capabilities,min_daily_budget,min_campaign_group_spend_cap,is_personal,business_name,business_country_code,business_city,business_state,business_zip,business_street,business_street2,opportunity_score",
+  "business": "id,name,verification_status,two_factor_type,created_time,updated_time,primary_page{id,name},is_hidden,link,profile_picture_uri,owned_ad_accounts{id,account_id,name,account_status,currency,timezone_name,amount_spent,disable_reason},client_ad_accounts{id,account_id,name,account_status,currency},owned_pages{id,name,verification_status,fan_count},client_pages{id,name},owned_pixels{id,name},owned_businesses{id,name,verification_status},business_users{id,name,email,role},system_users{id,name,role}",
+  "page": "id,name,username,link,category,category_list{id,name},tasks,is_published,verification_status,fan_count,followers_count,talking_about_count,created_time,picture{url,width,height},cover{source,id},engagement{count,social_sentence},business{id,name},about,description,general_info,website,phone,location{city,country,street,zip,latitude,longitude},single_line_address,connected_instagram_account{id,username},instagram_business_account{id,username}",
+  "pixel": "id,name,last_fired_time,creation_time,is_unavailable,owner_business{id,name},owner_ad_account{id,name},data_use_setting,enable_automatic_matching,automatic_matching_fields,first_party_cookie_status,is_created_by_business,has_1p_pixel_event,is_crm,code,description,usage,event_stats,event_time_min,event_time_max,valid_entries,matched_entries,duplicate_entries,match_rate_approx",
+  "user_via": "id,name,first_name,last_name,picture{url,width,height},link,businesses{id,name,verification_status,created_time},adaccounts{account_id,name,account_status,disable_reason,currency,amount_spent,spend_cap},accounts{id,name,category,tasks},permissions{permission,status},business_users{id,name,role,business},token_for_business"
+ },
+ "notes": {
+  "money_cents": "Все денежные поля отдаются в ЦЕНТАХ (минорных единицах валюты из currency): ad_account.amount_spent/spend_cap/balance/min_daily_budget/min_campaign_group_spend_cap; в рёбрах business.owned_ad_accounts.amount_spent, business.extendedcredits.balance/max_balance, user_via.adaccounts.amount_spent/spend_cap. Перед показом Полине делить на 100. В ru_label помечено ', $ (в центах)'.",
+  "codes_not_text": "Числовые КОДЫ (расшифровку держать мэппингом в коде, не строкой): account_status (1=активен,2=отключён,3=неоплачен,7=риск-ревью,8=ожидает оплаты,9=grace,100=ожидает закрытия,101=закрыт), disable_reason (0=нет,1=нарушение политики,2=проверка IP,3=платёжный риск...), tax_id_status (0..5), is_personal. То же account_status/disable_reason внутри рёбер adaccounts.",
+  "one_bad_field_crashes_get": "Graph API валит ВЕСЬ GET, если хоть одно поле в fields= неизвестно/недоступно. Поэтому collect_field_strings собраны из safe+may_error и рекомендуется двухпроходный сбор: (1) запросить строку целиком; (2) если GET упал — повторить, отбросив may_error-поля (или запросить их отдельным батчем/по одному). needs_perm-поля в дефолтный сбор НЕ включены совсем.",
+  "legacy_excluded": "НЕ включены в план и в collect (ронят GET / отсутствуют в v24): ad_account.adtrust_dsl, all_capabilities, user_role (роль брать из user_tasks); business.is_disabled_for_integrity_reasons (живость БМ определять по verification_status=revoked/rejected или is_hidden); page.is_verified/is_unpublished (устарели → verification_status/is_published); deprecated поля User: verified, timezone, locale, updated_time, third_party_id, local_news_*.",
+  "always_empty_dropped": "У User с 04.04.2018 не отдаются (выброшены): about, education, website, political, religion, relationship_status. Не рассчитывать.",
+  "needs_perm_meaning": "risk=needs_perm — сессионный EAAB-токен из Ads Manager (business_management+ads_read+pages_show_list) эти поля обычно НЕ несёт: вернутся пустыми или уронят запрос. Оставлены как колонки для ручного/расширенного сбора, но в collect_field_strings их НЕТ. Page-поля (emails, *_count, promotion_*, access_token/page_token) требуют ИМЕННО page access token, а не юзер-токен — секрет access_token не показывать Полине.",
+  "edges_pagination": "Поля-рёбра (owned_*/client_*/business_users/system_users у business; businesses/adaccounts/accounts/permissions у user_via) пагинируются и у крупных БМ приходят порциями. Надёжнее тянуть их отдельными вызовами /{id}/<edge> или /me/<edge>, а не через один fields= — иначе тяжёлый GET и риск таймаута. В базе хранить как JSON-строку (longtext); при желании нормализовать в связанные строки таблиц Лички/ФП/Пиксели.",
+  "unix_vs_iso": "У пикселя event_time_min/max и last_upload_app_changed_time/user_access_expire_time приходят UNIX-СЕКУНДАМИ (число), а creation_time/last_fired_time — ISO8601. Конвертировать при показе.",
+  "ids_as_strings": "Все id (act_/account_id/pixel_id/bm_id и т.п.) хранить СТРОКОЙ — длинные числа теряют точность в number.",
+  "relations": "c_acc — синтетическая связь на таблицу «Аккаунты» (какой VIA-профиль мы сканировали, заполняем сами при сборе, graph_field пустой). c_bm — связь на таблицу «БМы»: для Лички/ФП берётся из business{id,name} (у ФП это may_error, но с business_management у нашего токена обычно отдаётся), для Пикселя — из owner_business{id,name}. В user_via c_acc/c_bm не нужны: это сама строка аккаунта, а его БМы лежат в ребре c_via_businesses.",
+  "smit_parity": "smit_shown=true повторяет то, что SMIT Ads Check выводит в шапках вкладок; остальные (false) — сверх SMIT, чтобы дать 'максимум', как просила Полина. Отфильтровать вид 'как в SMIT' можно по smit_shown."
+ }
+}

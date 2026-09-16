@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Ad Inventory Sync",
+  "version": "1.0.0",
+  "description": "Автосбор FB-инвентаря в базу при открытии Ads Manager",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://*.facebook.com/*",
+    "https://graph.facebook.com/*",
+    "https://*.amvera.io/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/adsmanager/*",
+        "https://business.facebook.com/*",
+        "https://adsmanager.facebook.com/*"
+      ],
+      "js": ["config.js", "collect.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

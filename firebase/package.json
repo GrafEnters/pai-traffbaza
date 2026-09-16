@@ -1,0 +1,13 @@
+{
+  "name": "adspower-database-scripts",
+  "description": "Служебные скрипты: сид схемы, роли команды, отправка тестового инвентаря",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "seed": "node seed.js",
+    "roles": "node set_role.js --list"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

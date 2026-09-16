@@ -1,0 +1,16 @@
+{
+  "name": "adspower-database-tests",
+  "description": "Сквозные тесты слоя хранилища и правил Firestore на эмуляторах Firebase",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "firebase emulators:exec --only auth,firestore --project demo-inventory --config ../firebase.emulator.json \"node adapter.test.js\""
+  },
+  "dependencies": {
+    "firebase": "^10.14.1",
+    "firebase-admin": "^12.7.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.29.1"
+  }
+}

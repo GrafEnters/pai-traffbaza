@@ -1,0 +1,42 @@
+# Автодеплой веб-приложения при пуше в main (канал §12Б из ТЗ).
+#
+# Что настроить один раз в репозитории:
+#   Settings -> Secrets and variables -> Actions -> New repository secret
+#     FIREBASE_SERVICE_ACCOUNT — содержимое JSON-ключа service-account
+#                                с ролью «Firebase Hosting Admin»
+#   Settings -> Variables -> New repository variable
+#     FIREBASE_PROJECT_ID — id проекта Firebase
+#
+# После этого правка public/index.html + push в main = выкладка.
+# Функции и правила деплоятся отдельно, руками: они меняются редко.
+
+name: Deploy Hosting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "public/**"
+      - "firebase.json"
+      - ".github/workflows/deploy-hosting.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Проверить, что конфиг Firebase заполнен
+        run: |
+          if grep -q "ЗАМЕНИ" public/firebase-config.js; then
+            echo "public/firebase-config.js всё ещё с заглушками — выкладывать нечего"
+            exit 1
+          fi
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live

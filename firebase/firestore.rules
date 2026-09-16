@@ -1,0 +1,70 @@
+rules_version = '2';
+
+// База закрыта: читать может только вошедший член команды, писать — админ и менеджер.
+// Массовый импорт от расширения идёт через Cloud Function на admin SDK и эти правила
+// не затрагивает — клиентского ключа на запись инвентаря не существует.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // роль берётся из custom claim; если claim не выставлен — считаем viewer
+    function role() {
+      return signedIn() ? (request.auth.token.role is string ? request.auth.token.role : 'viewer') : '';
+    }
+
+    function editor() {
+      return role() == 'admin' || role() == 'manager';
+    }
+
+    function admin() {
+      return role() == 'admin';
+    }
+
+    // роли команды: читает вошедший, пишет только админ через служебный скрипт
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // описания таблиц и колонок
+    match /tables/{tid} {
+      allow read: if signedIn();
+      allow create, update: if editor();
+      allow delete: if admin();
+
+      // сами данные
+      match /rows/{rid} {
+        allow read: if signedIn();
+        allow create, update: if editor();
+        allow delete: if editor();
+      }
+    }
+
+    // виды/фильтры
+    match /views/{vid} {
+      allow read: if signedIn();
+      allow write: if editor();
+    }
+
+    // лог действий: дописывать может редактор, стирать — никто
+    match /log/{key} {
+      allow read: if signedIn();
+      allow create, update: if editor();
+      allow delete: if false;
+    }
+
+    // суточные лимиты удалений
+    match /limits/{key} {
+      allow read: if signedIn();
+      allow write: if editor();
+    }
+
+    // всё остальное закрыто
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

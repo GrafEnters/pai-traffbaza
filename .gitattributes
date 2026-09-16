@@ -1,0 +1,15 @@
+# В репозитории держим переводы строк в стиле LF: сервер едет на Linux,
+# а работа идёт с Windows. Рабочие копии git развернёт как надо сам.
+* text=auto eol=lf
+
+# Бинарное и то, что трогать не надо
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+package-lock.json -diff linguist-generated
+
+# Входные материалы к ТЗ — справочные, в статистику языков не считаем
+# (путь с пробелами берём в кавычки — экранировать слэшем здесь нельзя)
+"Realtime Sync Sources/**" linguist-documentation
+docs/** linguist-documentation

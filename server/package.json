@@ -1,0 +1,25 @@
+{
+  "name": "adspower-database-server",
+  "description": "Сервер базы FB-инвентаря: API, живые обновления и приём от расширения",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "seed": "node seed.js",
+    "users": "node users.js",
+    "test": "node test/run.js",
+    "dev": "node dev.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "embedded-postgres": "18.4.0-beta.17"
+  }
+}
