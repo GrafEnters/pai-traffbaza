@@ -20,6 +20,7 @@ const {deepMerge} = require("../lib/merge");
 const {canWrite} = require("../lib/auth");
 const {parseDoc, parseCollection} = require("../lib/paths");
 const {inventoryRecords} = require("../lib/mapping");
+const {seedSchemaIfEmpty, createFirstAdmin} = require("../lib/bootstrap");
 
 /* ---------------- 1. слияние ---------------- */
 
@@ -407,4 +408,47 @@ async function ingestSuite(ctx) {
   ok("пустых ячеек не пишем", empties.length === 0, empties.length);
 }
 
-module.exports = {mergeSuite, apiSuite, adapterSuite, ingestSuite};
+/* ---------------- 5. первичное наполнение пустой базы ---------------- */
+
+async function bootstrapSuite(ctx) {
+  const {store} = ctx;
+  section("первичное наполнение");
+
+  // база уже не пустая (её наполнили предыдущие проверки) — сев должен молчать
+  const skipped = await seedSchemaIfEmpty(store);
+  ok("на непустой базе схему не перезаписываем", skipped.seeded === false, skipped);
+
+  // и админа не заводим, раз пользователи уже есть
+  const noAdmin = await createFirstAdmin(store, "someone@test.local:pass");
+  ok("второго админа поверх существующих не создаём", noAdmin.created === false, noAdmin);
+
+  // а на чистой базе схема должна разложиться целиком
+  const fresh = new (require("../lib/store").Store)({connectionString: ctx.freshUrl});
+  await fresh.init();
+  try {
+    const seeded = await seedSchemaIfEmpty(fresh);
+    ok("на пустой базе схема раскладывается", seeded.seeded === true, seeded);
+    ok("создано 8 таблиц", seeded.tables === 8, seeded.tables);
+    ok("создано 10 видов", seeded.views === 10, seeded.views);
+
+    const acc = await fresh.getDoc("tables", "t_acc");
+    ok("таблица аккаунтов на месте", acc.exists && acc.data.name === "Аккаунты");
+    ok("у неё есть колонки", Object.keys(acc.data.cols || {}).length > 20,
+        Object.keys(acc.data.cols || {}).length);
+
+    const admin = await createFirstAdmin(fresh, "first@test.local:firstpass");
+    ok("первый админ заводится", admin.created === true, admin);
+    const user = await fresh.findUserByEmail("first@test.local");
+    ok("и получает роль admin", user && user.role === "admin", user && user.role);
+
+    const second = await createFirstAdmin(fresh, "second@test.local:x");
+    ok("повторный вызов уже ничего не делает", second.created === false, second);
+
+    const bad = await createFirstAdmin(fresh, "не-почта");
+    ok("кривой BOOTSTRAP_ADMIN отбрасывается", bad.created === false, bad);
+  } finally {
+    await fresh.close();
+  }
+}
+
+module.exports = {mergeSuite, apiSuite, adapterSuite, ingestSuite, bootstrapSuite};

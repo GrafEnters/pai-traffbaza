@@ -23,7 +23,6 @@ const EmbeddedPostgres = pgModule.default || pgModule;
 const {createServer} = require("./index");
 const {ensureUtf8Database} = require("./lib/devdb");
 const {hashPassword} = require("./lib/auth");
-const {TABLES, VIEWS} = require("../scripts/schema");
 
 const KEEP = process.argv.includes("--keep");
 const PG_PORT = Number(process.env.DEV_PG_PORT || 54331);
@@ -32,21 +31,6 @@ const DB_NAME = "inventory";
 const ADMIN_EMAIL = process.env.DEV_ADMIN || "admin@local";
 const ADMIN_PASSWORD = process.env.DEV_PASSWORD || "admin12345";
 const SYNC_SECRET = process.env.SYNC_SECRET || "dev-sync-secret";
-
-async function seed(store) {
-  for (const [tid, def] of Object.entries(TABLES)) {
-    const existing = await store.getDoc("tables", tid);
-    if (existing.exists) continue;
-    await store.setDoc("tables", tid, {
-      name: def.name, order: def.order, deleted: false, cols: def.cols,
-      at: new Date().toISOString(), by: "dev",
-    });
-  }
-  for (const [vid, def] of Object.entries(VIEWS)) {
-    const existing = await store.getDoc("views", vid);
-    if (!existing.exists) await store.setDoc("views", vid, def);
-  }
-}
 
 async function main() {
   const dataDir = KEEP ?
@@ -76,8 +60,7 @@ async function main() {
     syncSecret: SYNC_SECRET,
     store: {connectionString},
   });
-
-  await seed(store);
+  // схему разложит сам сервер при первом запуске (см. lib/bootstrap.js)
   const existingAdmin = await store.findUserByEmail(ADMIN_EMAIL);
   if (!existingAdmin) {
     await store.upsertUser({

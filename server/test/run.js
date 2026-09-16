@@ -61,6 +61,10 @@ async function main() {
     port: PG_PORT, user: "postgres", password: "password", database: DB_NAME,
   });
   console.log(`База тестов в кодировке ${encoding}`);
+  // отдельная пустая база — на ней проверяем первичное наполнение
+  await ensureUtf8Database({
+    port: PG_PORT, user: "postgres", password: "password", database: `${DB_NAME}_fresh`,
+  });
 
   const connectionString =
     `postgres://postgres:password@127.0.0.1:${PG_PORT}/${DB_NAME}`;
@@ -71,6 +75,7 @@ async function main() {
     const built = await createServer({
       sessionSecret: SESSION_SECRET,
       syncSecret: SYNC_SECRET,
+      bootstrap: false, // схему тесты раскладывают сами, автосев тут не нужен
       store: {connectionString},
     });
     server = built.server;
@@ -86,12 +91,16 @@ async function main() {
     await store.upsertUser({email: "manager@test.local", passwordHash: hashPassword("managerpass"), role: "manager"});
     await store.upsertUser({email: "viewer@test.local", passwordHash: hashPassword("viewerpass"), role: "viewer"});
 
-    ctx = {baseUrl, store, secret: SYNC_SECRET};
+    ctx = {
+      baseUrl, store, secret: SYNC_SECRET,
+      freshUrl: `postgres://postgres:password@127.0.0.1:${PG_PORT}/${DB_NAME}_fresh`,
+    };
 
     suites.mergeSuite();
     await suites.apiSuite(ctx);
     await suites.adapterSuite(ctx);
     await suites.ingestSuite(ctx);
+    await suites.bootstrapSuite(ctx);
   } catch (e) {
     state.failed++;
     state.lines.push(`\n  FAIL прогон прервался: ${e && e.stack ? e.stack : e}`);

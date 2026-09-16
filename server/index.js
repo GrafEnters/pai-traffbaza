@@ -24,6 +24,7 @@ const {Auth} = require("./lib/auth");
 const {Live} = require("./lib/live");
 const {buildRoutes} = require("./lib/routes");
 const {buildIngest} = require("./lib/ingest");
+const {bootstrap} = require("./lib/bootstrap");
 
 const PORT = Number(process.env.PORT || 3000);
 const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(__dirname, "..", "public");
@@ -45,6 +46,16 @@ async function createServer(options) {
 
   const store = new Store(opts.store || {});
   await store.init();
+
+  // пустая база сама по себе бесполезна: разложим схему таблиц при первом
+  // запуске и, если попросили, заведём первого администратора
+  if (opts.bootstrap !== false) {
+    try {
+      await bootstrap(store, {admin: opts.bootstrapAdmin || process.env.BOOTSTRAP_ADMIN});
+    } catch (e) {
+      console.error("[bootstrap] не удалось подготовить базу:", e.message || e);
+    }
+  }
 
   const auth = new Auth(store, sessionSecret);
   const app = express();
