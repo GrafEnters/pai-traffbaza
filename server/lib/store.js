@@ -36,6 +36,19 @@ CREATE TABLE IF NOT EXISTS users (
 );
 `;
 
+/**
+ * Ограничения пула подключений.
+ *
+ * Команда небольшая, и десяток открытых соединений здесь ни к чему: каждое
+ * стоит памяти и приложению, и базе, а на младших тарифах её мало. Пять
+ * с запасом покрывают одновременные правки, лишние закрываются сами.
+ */
+const POOL_LIMITS = {
+  max: Number(process.env.PGPOOL_MAX || 5),
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+};
+
 /** случайный id документа — аналог автогенерации Firestore */
 const newId = () => crypto.randomBytes(12).toString("base64url");
 
@@ -66,7 +79,7 @@ function buildPool(options) {
     // сертификат у них собственный, поэтому цепочку не проверяем,
     // но само шифрование канала остаётся
     const ssl = needsSsl(url) ? {rejectUnauthorized: false} : undefined;
-    return new Pool({connectionString: url, ssl, max: 10});
+    return new Pool({connectionString: url, ssl, ...POOL_LIMITS});
   }
   return new Pool({
     host: process.env.PGHOST || "127.0.0.1",
@@ -74,7 +87,7 @@ function buildPool(options) {
     user: process.env.PGUSER || "postgres",
     password: process.env.PGPASSWORD || "",
     database: process.env.PGDATABASE || "postgres",
-    max: 10,
+    ...POOL_LIMITS,
   });
 }
 
