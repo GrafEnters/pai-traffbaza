@@ -39,14 +39,33 @@ CREATE TABLE IF NOT EXISTS users (
 /** случайный id документа — аналог автогенерации Firestore */
 const newId = () => crypto.randomBytes(12).toString("base64url");
 
+/**
+ * Нужен ли TLS для этого подключения.
+ *
+ * У Amvera два разных адреса одной и той же базы:
+ *   * внутренний (amvera-…-cnpg-…-rw) — из соседнего контейнера, TLS там нет;
+ *   * внешний (…db-msk0.amvera.tech) — с ноутбука, и вот он требует SSL.
+ * Оба содержат слово «amvera», поэтому различаем именно по домену: включить
+ * TLS там, где его не предлагают, — и подключение просто не установится.
+ *
+ * Принудительно задаётся переменной PGSSL=1 или PGSSL=0.
+ */
+function needsSsl(url) {
+  const force = process.env.PGSSL;
+  if (force === "1" || force === "true") return true;
+  if (force === "0" || force === "false") return false;
+  if (/sslmode=require|sslmode=verify/.test(url)) return true;
+  return /amvera\.tech|\.db-[a-z0-9]+\.amvera/.test(url);
+}
+
 function buildPool(options) {
   const opts = options || {};
   if (opts.pool) return opts.pool;
   const url = opts.connectionString || process.env.DATABASE_URL;
   if (url) {
-    // Amvera отдаёт PostgreSQL по TLS с собственным сертификатом,
-    // поэтому проверку цепочки не включаем, но шифрование остаётся.
-    const ssl = /sslmode=require|amvera/.test(url) ? {rejectUnauthorized: false} : undefined;
+    // сертификат у них собственный, поэтому цепочку не проверяем,
+    // но само шифрование канала остаётся
+    const ssl = needsSsl(url) ? {rejectUnauthorized: false} : undefined;
     return new Pool({connectionString: url, ssl, max: 10});
   }
   return new Pool({
@@ -66,8 +85,28 @@ class Store {
     this.onChange = (options && options.onChange) || null;
   }
 
-  async init() {
-    await this.pool.query(SCHEMA);
+  /**
+   * Создать схему и проверить базу.
+   *
+   * С повторами: при деплое контейнер приложения может подняться раньше, чем
+   * база начнёт принимать подключения. Без ожидания процесс падал бы, и Amvera
+   * крутила бы его в цикле перезапусков, пугая ошибками в логе.
+   */
+  async init(attempts = 10) {
+    for (let i = 1; ; i++) {
+      try {
+        await this.pool.query(SCHEMA);
+        break;
+      } catch (e) {
+        if (i >= attempts) {
+          console.error("[store] база так и не ответила:", e.message || e);
+          throw e;
+        }
+        const waitMs = Math.min(1000 * i, 5000);
+        console.warn(`[store] база не отвечает (попытка ${i}/${attempts}), жду ${waitMs} мс: ${e.message || e}`);
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+    }
     this.encoding = await this.checkEncoding();
   }
 
