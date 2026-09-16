@@ -1,9 +1,14 @@
 # Конфигурация деплоя на Amvera.
 #
 # Приложение — один Node-процесс: отдаёт веб-приложение из public/, обслуживает
-# его API, держит WebSocket и принимает инвентарь от расширения.
+# его API, держит WebSocket для живых обновлений и принимает инвентарь от
+# расширения. Точка входа — server/index.js.
 #
-# Перед первым деплоем в панели Amvera задай переменные окружения:
+# Сборка: Amvera сама выполняет `npm install` в корне репозитория. Там лежат
+# только боевые зависимости (express, pg, ws) — инструменты разработки вынесены
+# в server/package.json и в контейнер не попадают.
+#
+# Перед первым деплоем задай в панели Amvera переменные окружения:
 #   DATABASE_URL    строка подключения к твоему PostgreSQL в Amvera
 #   SESSION_SECRET  длинная случайная строка (подпись сессионных cookie)
 #   SYNC_SECRET     общий секрет с расширением
@@ -21,12 +26,7 @@ meta:
     name: npm
     version: 20
 
-build:
-  # ставим зависимости только сервера; public/ — статика, сборка ей не нужна
-  additionalCommands:
-    - cd server && npm install --omit=dev
-
 run:
-  command: node server/index.js
+  command: npm start
   containerPort: 3000
   persistenceMount: /data

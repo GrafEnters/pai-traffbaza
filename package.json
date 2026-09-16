@@ -1,0 +1,23 @@
+{
+  "name": "pai-traffbaza",
+  "description": "Реалтайм-база FB-инвентаря: сервер, веб-приложение и расширение AdsPower",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/dev.js",
+    "seed": "node server/seed.js",
+    "users": "node server/users.js",
+    "test": "node server/test/run.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "ws": "^8.18.0"
+  }
+}

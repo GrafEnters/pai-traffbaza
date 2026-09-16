@@ -1,24 +1,13 @@
 {
-  "name": "adspower-database-server",
-  "description": "Сервер базы FB-инвентаря: API, живые обновления и приём от расширения",
+  "name": "pai-traffbaza-devtools",
+  "description": "Инструменты разработки: встроенный PostgreSQL для локального запуска и тестов",
   "version": "1.0.0",
   "private": true,
-  "main": "index.js",
-  "engines": {
-    "node": ">=20"
-  },
-  "scripts": {
-    "start": "node index.js",
-    "seed": "node seed.js",
-    "users": "node users.js",
-    "test": "node test/run.js",
-    "dev": "node dev.js"
-  },
-  "dependencies": {
-    "express": "^4.21.2",
-    "pg": "^8.13.1",
-    "ws": "^8.18.0"
-  },
+  "comment": [
+    "Боевые зависимости сервера лежат в корневом package.json — оттуда их ставит",
+    "сборка Amvera. Здесь только то, что нужно локально: встроенный PostgreSQL.",
+    "Он тянет бинарник на сотню мегабайт, и в контейнере ему делать нечего."
+  ],
   "devDependencies": {
     "embedded-postgres": "18.4.0-beta.17"
   }
