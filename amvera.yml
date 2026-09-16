@@ -9,24 +9,33 @@
 # в server/package.json и в контейнер не попадают.
 #
 # Перед первым деплоем задай в панели Amvera переменные окружения:
-#   DATABASE_URL    строка подключения к твоему PostgreSQL в Amvera
-#   SESSION_SECRET  длинная случайная строка (подпись сессионных cookie)
-#   SYNC_SECRET     общий секрет с расширением
+#   DATABASE_URL     строка подключения к PostgreSQL (внутренний адрес, …-rw)
+#   SESSION_SECRET   длинная случайная строка (подпись сессионных cookie)
+#   SYNC_SECRET      общий секрет с расширением
+#   BOOTSTRAP_ADMIN  на один раз: почта:пароль первого администратора
 #
-# Тариф: не ниже «Начальный». На «Пробном» (100 Мб памяти) клиент PostgreSQL
-# не поднимется — об этом предупреждает и документация Amvera.
-#
-# Реплика должна быть одна: живые обновления держатся на постоянных
-# WebSocket-соединениях, а закрепление клиента за репликой у Amvera
-# не документировано.
+# Тариф: не ниже «Начальный». На «Пробном» (100 Мб памяти) приложению с
+# клиентом PostgreSQL не хватает ОЗУ — документация Amvera называет это
+# среди причин ошибки 503.
 
 meta:
-  environment: node
+  environment: nodejs
   toolchain:
     name: npm
-    version: 20
+    version: "20"
+
+build:
+  skip: false
+  additionalCommands: null
+  artifacts:
+    "*": /
 
 run:
-  command: npm start
+  command: npm run start
+  # порт должен совпадать с указанным в настройках приложения
   containerPort: 3000
   persistenceMount: /data
+  # одна реплика: живые обновления держатся на постоянных WebSocket-соединениях,
+  # а закрепление клиента за репликой у Amvera не документировано
+  singleton: true
+  zeroDowntime: false
