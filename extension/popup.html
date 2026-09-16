@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<title>Ad Inventory Sync</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #F6F6F9; --surface: #FFF; --line: #E2E2EC;
+    --ink: #1D1E2C; --muted: #6E7087; --accent: #5850C7;
+    --ok: #1F8F45; --ok-soft: #E3F4E8;
+    --bad: #C43A3A; --bad-soft: #FBE9E9;
+    --idle: #6B6D80; --idle-soft: #ECECF2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131420; --surface: #1B1C2B; --line: #2E2F44;
+      --ink: #E9E9F2; --muted: #9698B0; --accent: #8A83E8;
+      --ok: #4CC07A; --ok-soft: #1C3226;
+      --bad: #E4726F; --bad-soft: #3A2224;
+      --idle: #9B9DB2; --idle-soft: #282936;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 300px; background: var(--bg); color: var(--ink);
+    font: 13px/1.45 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 14px;
+  }
+  h1 { font-size: 13.5px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 11.5px; margin-bottom: 12px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 11px 12px;
+  }
+  .badge {
+    display: inline-block; border-radius: 6px; padding: 2px 9px;
+    font-size: 11.5px; font-weight: 700; margin-bottom: 7px;
+  }
+  .s-ok { background: var(--ok-soft); color: var(--ok); }
+  .s-error { background: var(--bad-soft); color: var(--bad); }
+  .s-idle { background: var(--idle-soft); color: var(--idle); }
+  .msg { margin-bottom: 9px; }
+  .counts { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+  .chip {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 7px;
+    padding: 3px 8px; font-size: 11.5px;
+  }
+  .chip b { font-variant-numeric: tabular-nums; }
+  .kv { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; color: var(--muted); }
+  .kv + .kv { margin-top: 3px; }
+  .kv span:last-child { color: var(--ink); text-align: right; word-break: break-all; }
+  .hint { color: var(--muted); font-size: 11px; margin-top: 10px; line-height: 1.4; }
+</style>
+
+<h1>Ad Inventory Sync</h1>
+<div class="sub">Сбор FB-инвентаря в общую базу</div>
+<div id="out" class="card">Читаю состояние…</div>
+<div class="hint" id="hint"></div>
+
+<script src="popup.js"></script>
+</html>

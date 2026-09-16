@@ -97,28 +97,91 @@ async function markSynced(fbid) {
   await chrome.storage.local.set({ [syncKey(fbid)]: Date.now() });
 }
 
+// Итог последнего прогона — его показывает окошко расширения.
+// Без этого понять, работает ли сбор, можно было только через консоль,
+// а расширение стоит на всех профилях, и лезть в каждый не вариант.
+async function setStatus(state, message, extra) {
+  const status = Object.assign({
+    at: Date.now(),
+    state,            // ok | idle | error
+    message,
+    host: (() => {
+      try {
+        return new URL(ENDPOINT).host;
+      } catch (e) {
+        return "";
+      }
+    })(),
+  }, extra || {});
+  try {
+    await chrome.storage.local.set({laststatus: status});
+  } catch (e) { /* storage недоступен — не беда */ }
+  return status;
+}
+
 (async () => {
   try {
     if (!ENDPOINT || !SHARED_SECRET || ENDPOINT.indexOf("ЗАМЕНИ") >= 0) {
       log("не настроен config.js — сбор пропущен");
+      await setStatus("error", "Не заполнен config.js расширения");
       return;
     }
     // токен снимаем сразу, но сначала дешёвая проверка: не синкали ли недавно
-    const tokPeek = grabToken(); if (!tokPeek) { log("токен не найден на странице"); return; }
+    const tokPeek = grabToken();
+    if (!tokPeek) {
+      log("токен не найден на странице");
+      await setStatus("idle", "На этой странице токен не найден — открой Ads Manager");
+      return;
+    }
     const me = await gf(tokPeek, "me", "id");
-    if (!me || !me.id) { log("me не отдался — пропускаем"); return; }
-    if (!await shouldSync(me.id)) { log("уже синкали этот аккаунт в последний час"); return; }
+    if (!me || !me.id) {
+      log("me не отдался — пропускаем");
+      await setStatus("error", "Facebook не отдал данные аккаунта по токену");
+      return;
+    }
+    if (!await shouldSync(me.id)) {
+      log("уже синкали этот аккаунт в последний час");
+      await setStatus("ok", "Этот аккаунт уже отправлен, следующий сбор через час", {fbid: me.id});
+      return;
+    }
 
-    const inv = await collect(); if (!inv || !inv.user) return;
-    log("собрано:", {
+    const inv = await collect();
+    if (!inv || !inv.user) {
+      await setStatus("error", "Не удалось собрать инвентарь");
+      return;
+    }
+    const counts = {
       bm: inv.businesses.length, aa: inv.ad_accounts.length,
       fp: inv.pages.length, px: inv.pixels.length,
-    });
-    const r = await fetch(ENDPOINT, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ secret: SHARED_SECRET, inv }),
-    });
-    if (r.ok) await markSynced(inv.user.id);
-    log("ответ функции:", r.status, await r.text().catch(() => ""));
-  } catch (e) { log("сбор упал:", e); /* сбор best-effort — тихо */ }
+    };
+    log("собрано:", counts);
+
+    let r;
+    try {
+      r = await fetch(ENDPOINT, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({secret: SHARED_SECRET, inv}),
+      });
+    } catch (e) {
+      log("не достучался до базы:", e);
+      await setStatus("error", "База недоступна — проверь адрес в config.js", {counts});
+      return;
+    }
+
+    const body = await r.text().catch(() => "");
+    log("ответ базы:", r.status, body);
+    if (r.ok) {
+      await markSynced(inv.user.id);
+      await setStatus("ok", "Отправлено в базу", {
+        counts, fbid: inv.user.id, fbname: inv.user.name || "",
+      });
+    } else {
+      await setStatus("error", r.status === 403 ?
+        "База не приняла секрет — сверь его с настройками приложения" :
+        `База ответила ошибкой ${r.status}`, {counts, httpStatus: r.status});
+    }
+  } catch (e) {
+    log("сбор упал:", e);
+    await setStatus("error", "Сбор прервался: " + ((e && e.message) || e));
+  }
 })();

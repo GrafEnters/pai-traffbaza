@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Ad Inventory Sync",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Автосбор FB-инвентаря в базу при открытии Ads Manager",
   "permissions": ["storage"],
   "host_permissions": [
@@ -9,6 +9,20 @@
     "https://graph.facebook.com/*",
     "https://*.amvera.io/*"
   ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Ad Inventory Sync — состояние сбора",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
   "content_scripts": [
     {
       "matches": [
