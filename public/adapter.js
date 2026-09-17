@@ -350,6 +350,24 @@
         location.reload();
       });
     },
+    // управление командой: доступно только администратору, проверяет сервер
+    team: {
+      list: function () {
+        return request("GET", API + "/team");
+      },
+      add: function (email, role, password) {
+        return request("POST", API + "/team", {email: email, role: role, password: password});
+      },
+      setRole: function (email, role) {
+        return request("PATCH", API + "/team", {email: email, role: role});
+      },
+      setPassword: function (email, password) {
+        return request("PATCH", API + "/team", {email: email, password: password});
+      },
+      remove: function (email) {
+        return request("DELETE", API + "/team?email=" + encodeURIComponent(email));
+      },
+    },
     getRole: function () {
       if (currentUser && currentUser.role) return Promise.resolve(currentUser.role);
       return loadUser().then(function (me) {

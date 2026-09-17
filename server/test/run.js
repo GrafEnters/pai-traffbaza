@@ -101,6 +101,7 @@ async function main() {
     await suites.adapterSuite(ctx);
     await suites.ingestSuite(ctx);
     await suites.bootstrapSuite(ctx);
+    await suites.teamSuite(ctx);
   } catch (e) {
     state.failed++;
     state.lines.push(`\n  FAIL прогон прервался: ${e && e.stack ? e.stack : e}`);

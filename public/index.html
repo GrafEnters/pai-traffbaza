@@ -649,6 +649,7 @@ function renderSide(){
   }
   if(role==='admin'){
     h+=`<div class="side-h" style="margin-top:8px">Сервис</div>`;
+    h+=`<div class="titem ${screen==='team'?'on':''}" data-act="team"><span>◍</span>Команда</div>`;
     h+=`<div class="titem ${screen==='log'?'on':''}" data-act="log"><span>≡</span>Лог действий</div>`;
     h+=`<div class="titem ${screen==='analytics'?'on':''}" data-act="analytics"><span>◔</span>Аналитика</div>`;
   }
@@ -661,6 +662,7 @@ $('#sidelist').addEventListener('click',e=>{
   if(a.dataset.act==='addtable'){const n=prompt('Название новой таблицы:');if(n)addTable(n.trim());}
   if(a.dataset.act==='addview')addView(activeT);
   if(a.dataset.act==='log'&&role==='admin'){screen='log';render();}
+  if(a.dataset.act==='team'&&role==='admin'){screen='team';render();}
   if(a.dataset.act==='buyers'&&canEdit()){screen='buyers';buyerSel=null;render();window.scrollTo(0,0);}
   if(a.dataset.act==='analytics'){screen='analytics';render();}
 });
@@ -672,6 +674,7 @@ function render(){
   renderWho();renderSide();
   if(cardOpen)openRowCard(cardOpen.tid,cardOpen.ridv);
   if(screen==='log'){if(role!=='admin'){screen='grid';}else{if(!document.querySelector('[data-screen="log"]'))renderLog();return;}}
+  if(screen==='team'){if(role!=='admin'){screen='grid';}else{if(!document.querySelector('[data-screen="team"]'))renderTeam();return;}}
   if(screen==='analytics'){if(!document.querySelector('[data-screen="an"]'))renderAnalytics();return;}
   if(screen==='buyers'){if(!canEdit()){screen='grid';}else{if(!document.querySelector('[data-screen="buyers"]'))renderBuyers();return;}}
   if(screen==='buyer'){if(!canEdit()){screen='grid';}else{if(!document.querySelector('[data-screen="buyer"]'))renderBuyerCard();return;}}
@@ -1289,6 +1292,125 @@ function renderAccountCard(){
     const[tid,ridv]=el2.dataset.gorow.split(':');(role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard(tid,ridv));}));
   const bk=$('#main').querySelector('[data-act="acctback"]');if(bk)bk.addEventListener('click',()=>{screen='grid';render();});
   const ed=$('#main').querySelector('[data-act="acctedit"]');if(ed)ed.addEventListener('click',()=>{(role==='admin'?loadAllLogs():Promise.resolve()).then(()=>openRowCard('t_acc',rid));});
+}
+
+/* ============ команда (только админ) ============ */
+const TEAM_ROLES=[['admin','Админ','purple'],['manager','Менеджер','blue'],['viewer','Просмотр','gray']];
+function teamRolePill(r){
+  const row=TEAM_ROLES.find(x=>x[0]===r)||['','—','gray'];
+  return `<span class="pill" style="background:var(--cs-${row[2]});color:var(--c-${row[2]})">${esc(row[1])}</span>`;
+}
+function teamPassword(){
+  const a='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const r=new Uint32Array(14); crypto.getRandomValues(r);
+  let o=''; for(const n of r)o+=a[n%a.length]; return o;
+}
+async function renderTeam(){
+  if(role!=='admin'){screen='grid';render();return;}
+  $('#main').innerHTML='<div class="loading">Загружаю команду…</div>';
+  let data;
+  try{ data=await window.__AUTH__.team.list(); }
+  catch(e){ $('#main').innerHTML=`<div class="empty">Не смог загрузить список: ${esc(e.message||'')}</div>`; return; }
+  const me=String(data.me||'').toLowerCase();
+  const users=(data.users||[]).slice().sort((a,b)=>{
+    const w=r=>r==='admin'?0:r==='manager'?1:2;
+    return (w(a.role)-w(b.role))||String(a.email).localeCompare(String(b.email));
+  });
+  const admins=users.filter(u=>u.role==='admin').length;
+
+  const rows=users.map(u=>{
+    const self=String(u.email).toLowerCase()===me;
+    const lastAdmin=u.role==='admin'&&admins<=1;
+    const locked=self||lastAdmin;
+    return `<div class="relrow" style="cursor:default;gap:10px;flex-wrap:wrap">
+      <b style="min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(u.email)}</b>
+      ${self?'<span class="src-note">это ты</span>':''}
+      <span style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        ${teamRolePill(u.role)}
+        <select class="mini" data-trole="${esc(u.email)}" ${locked?'disabled title="нельзя менять свою роль и роль последнего админа"':''}>
+          ${TEAM_ROLES.map(([id,label])=>`<option value="${id}" ${u.role===id?'selected':''}>${esc(label)}</option>`).join('')}
+        </select>
+        <button class="mini" data-tpass="${esc(u.email)}">пароль</button>
+        <button class="mini" data-tdel="${esc(u.email)}" ${locked?'disabled':''} style="color:var(--c-red)">удалить</button>
+      </span>
+    </div>`;
+  }).join('');
+
+  $('#main').innerHTML=`<div class="logscreen" data-screen="team">
+    <h1>Команда</h1>
+    <p class="hint" style="max-width:74ch;margin:0 0 14px">Кто имеет доступ к базе и с какими правами.
+      Вход идёт по почте, поэтому адрес обязателен. Админ видит всё и управляет командой,
+      менеджер правит данные и ограничен десятью удалениями в сутки, просмотр только читает.
+      После смены роли человеку нужно перезайти.</p>
+    <div class="an-grid">
+      <div class="an-panel"><h3>Добавить человека</h3>
+        <div class="fld"><div class="fl">Почта</div>
+          <input type="email" id="t-email" placeholder="buyer@example.com" style="width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:7px 9px"></div>
+        <div class="fld"><div class="fl">Роль</div>
+          <select id="t-role" style="width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:7px 9px">
+            ${TEAM_ROLES.map(([id,label])=>`<option value="${id}" ${id==='manager'?'selected':''}>${esc(label)}</option>`).join('')}
+          </select></div>
+        <div class="fld"><div class="fl">Пароль, от 8 символов</div>
+          <input type="text" id="t-pass" placeholder="придумай или сгенерируй" style="width:100%;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:7px 9px">
+          <button class="mini" id="t-gen" style="margin-top:6px">сгенерировать</button></div>
+        <div id="t-err" style="color:var(--c-red);font-size:12px;font-weight:700;min-height:16px;margin-bottom:6px"></div>
+        <button class="btn" id="t-add" style="width:100%">Добавить в команду</button>
+      </div>
+      <div class="an-panel"><h3>Сейчас в команде <span class="src-note">${users.length}</span></h3>
+        ${rows||'<div class="hint">Пусто</div>'}
+        ${admins<=1?'<div class="hint" style="margin-top:10px">Админ пока один. Его нельзя понизить или удалить — иначе в базу будет не войти.</div>':''}
+      </div>
+    </div>
+  </div>`;
+
+  const showErr=t=>{const b=$('#t-err'); if(b)b.textContent=t||'';};
+
+  $('#t-gen').addEventListener('click',()=>{$('#t-pass').value=teamPassword();});
+
+  $('#t-add').addEventListener('click',async()=>{
+    const email=$('#t-email').value.trim(), r=$('#t-role').value, pass=$('#t-pass').value;
+    showErr('');
+    if(!email||email.indexOf('@')<0){showErr('Нужен адрес почты — по нему человек будет входить');return;}
+    if(pass.length<8){showErr('Пароль короче 8 символов');return;}
+    const btn=$('#t-add'); btn.disabled=true; btn.textContent='Добавляю…';
+    try{
+      await window.__AUTH__.team.add(email,r,pass);
+      // в лог действий это пишет сервер: он знает, кто именно менял,
+      // и запись не пропадёт, если правку сделали мимо интерфейса
+      toast('Добавлен: '+email);
+      renderTeam();
+    }catch(e){ showErr(e.message||'Не получилось'); btn.disabled=false; btn.textContent='Добавить в команду'; }
+  });
+
+  $('#main').querySelectorAll('[data-trole]').forEach(sel=>sel.addEventListener('change',async()=>{
+    const email=sel.dataset.trole;
+    try{
+      await window.__AUTH__.team.setRole(email,sel.value);
+      toast('Роль изменена — человеку нужно перезайти');
+      renderTeam();
+    }catch(e){ toast(e.message||'Не получилось'); renderTeam(); }
+  }));
+
+  $('#main').querySelectorAll('[data-tpass]').forEach(b=>b.addEventListener('click',async()=>{
+    const email=b.dataset.tpass;
+    const pass=prompt(`Новый пароль для ${email}, от 8 символов:`, teamPassword());
+    if(!pass)return;
+    if(pass.length<8){toast('Пароль короче 8 символов');return;}
+    try{
+      await window.__AUTH__.team.setPassword(email,pass);
+      toast('Пароль изменён — передай его лично');
+    }catch(e){ toast(e.message||'Не получилось'); }
+  }));
+
+  $('#main').querySelectorAll('[data-tdel]').forEach(b=>b.addEventListener('click',async()=>{
+    const email=b.dataset.tdel;
+    if(!confirm(`Убрать ${email} из команды? Доступ к базе пропадёт сразу.`))return;
+    try{
+      await window.__AUTH__.team.remove(email);
+      toast('Удалён: '+email);
+      renderTeam();
+    }catch(e){ toast(e.message||'Не получилось'); }
+  }));
 }
 
 /* ============ аналитика (только админ) ============ */

@@ -19,6 +19,7 @@
 const express = require("express");
 const {parseCollection, parseDoc, PathError} = require("./paths");
 const {canWrite} = require("./auth");
+const {buildTeam} = require("./team");
 
 function wrap(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
@@ -51,6 +52,12 @@ function buildRoutes({store, auth, live, secure}) {
     if (!payload) return res.status(401).json({error: "нужен вход"});
     res.json({email: payload.email, role: payload.role});
   });
+
+  /* ---------- команда ---------- */
+
+  // управление людьми вынесено отдельным модулем: там свои правила,
+  // включая защиту от удаления последнего администратора
+  router.use("/team", buildTeam({store, auth}));
 
   /* ---------- коллекции ---------- */
 

@@ -451,4 +451,86 @@ async function bootstrapSuite(ctx) {
   }
 }
 
-module.exports = {mergeSuite, apiSuite, adapterSuite, ingestSuite, bootstrapSuite};
+/* ---------------- 6. управление командой ---------------- */
+
+async function teamSuite(ctx) {
+  const {baseUrl} = ctx;
+  const {makeClient: mk} = require("./helpers");
+  const admin = mk(baseUrl);
+  const manager = mk(baseUrl);
+  await admin.call("POST", "/api/auth/login", {email: "admin@test.local", password: "adminpass"});
+  await manager.call("POST", "/api/auth/login", {email: "manager@test.local", password: "managerpass"});
+
+  section("команда: доступ");
+  const byManager = await manager.call("GET", "/api/team");
+  ok("менеджер не видит раздел команды", byManager.status === 403, byManager.status);
+  const byAdmin = await admin.call("GET", "/api/team");
+  ok("админ видит список", byAdmin.status === 200 && Array.isArray(byAdmin.data.users), byAdmin.status);
+  ok("список знает, кто я", byAdmin.data.me === "admin@test.local", byAdmin.data.me);
+
+  section("команда: добавление");
+  const noAt = await admin.call("POST", "/api/team", {email: "polina", role: "admin", password: "starPolina"});
+  ok("логин без собаки отклоняется", noAt.status === 400, noAt);
+  const shortPass = await admin.call("POST", "/api/team", {email: "p@example.com", role: "admin", password: "123"});
+  ok("короткий пароль отклоняется", shortPass.status === 400, shortPass);
+  const badRole = await admin.call("POST", "/api/team", {email: "p@example.com", role: "король", password: "starPolina"});
+  ok("неизвестная роль отклоняется", badRole.status === 400, badRole);
+
+  const added = await admin.call("POST", "/api/team", {email: "Polina@Example.com", role: "admin", password: "starPolina"});
+  ok("человек добавляется", added.status === 200, added);
+  ok("почта приводится к нижнему регистру", added.data.email === "polina@example.com", added.data);
+
+  const dup = await admin.call("POST", "/api/team", {email: "polina@example.com", role: "viewer", password: "starPolina"});
+  ok("повторное добавление отклоняется", dup.status === 409, dup.status);
+
+  section("команда: новый человек может войти");
+  const polina = mk(baseUrl);
+  const login = await polina.call("POST", "/api/auth/login", {email: "polina@example.com", password: "starPolina"});
+  ok("вход под новым админом работает", login.status === 200 && login.data.role === "admin", login);
+  ok("и он видит раздел команды", (await polina.call("GET", "/api/team")).status === 200);
+
+  section("команда: защита от самоблокировки");
+  const selfDemote = await admin.call("PATCH", "/api/team", {email: "admin@test.local", role: "viewer"});
+  ok("нельзя понизить самого себя", selfDemote.status === 400, selfDemote);
+  const selfDelete = await admin.call("DELETE", "/api/team?email=admin%40test.local");
+  ok("нельзя удалить самого себя", selfDelete.status === 400, selfDelete);
+
+  section("команда: смена роли и пароля");
+  const demote = await admin.call("PATCH", "/api/team", {email: "polina@example.com", role: "manager"});
+  ok("роль меняется", demote.status === 200, demote);
+  const after = (await admin.call("GET", "/api/team")).data.users.find((u) => u.email === "polina@example.com");
+  ok("роль в списке обновилась", after && after.role === "manager", after);
+
+  const newPass = await admin.call("PATCH", "/api/team", {email: "polina@example.com", password: "новыйДлинныйПароль"});
+  ok("пароль меняется", newPass.status === 200, newPass);
+  const relogin = mk(baseUrl);
+  ok("старый пароль больше не подходит",
+      (await relogin.call("POST", "/api/auth/login", {email: "polina@example.com", password: "starPolina"})).status === 401);
+  ok("новый пароль подходит",
+      (await relogin.call("POST", "/api/auth/login", {email: "polina@example.com", password: "новыйДлинныйПароль"})).status === 200);
+
+  section("команда: последний админ");
+  // сейчас админ ровно один: admin@test.local (polina стала менеджером)
+  const lastAdminDemote = await admin.call("PATCH", "/api/team", {email: "admin@test.local", role: "manager"});
+  ok("последнего админа не понизить", lastAdminDemote.status === 400, lastAdminDemote);
+
+  section("команда: удаление");
+  const gone = await admin.call("DELETE", "/api/team?email=polina%40example.com");
+  ok("человек удаляется", gone.status === 200, gone);
+  ok("и войти больше не может",
+      (await mk(baseUrl).call("POST", "/api/auth/login",
+          {email: "polina@example.com", password: "новыйДлинныйПароль"})).status === 401);
+  const missing = await admin.call("DELETE", "/api/team?email=никого%40example.com");
+  ok("удаление несуществующего — 404", missing.status === 404, missing.status);
+
+  section("команда: события попадают в лог");
+  const logs = (await admin.call("GET", admin.col("log"))).data.docs;
+  const items = logs.flatMap((d) => (d.data && d.data.items) || []);
+  ok("добавление записано в лог",
+      items.some((i) => /добавлен polina@example\.com/.test(i.text || "")), items.length);
+  ok("удаление записано в лог",
+      items.some((i) => /удалён polina@example\.com/.test(i.text || "")));
+  ok("в логе указан, кто менял", items.some((i) => i.by === "admin@test.local"));
+}
+
+module.exports = {mergeSuite, apiSuite, adapterSuite, ingestSuite, bootstrapSuite, teamSuite};
