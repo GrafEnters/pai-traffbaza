@@ -4,6 +4,7 @@ node_modules/
 # секреты — в репозиторий не попадают никогда
 .env
 .env.*
+!.env.example
 extension/config.js
 serviceAccount*.json
 **/serviceAccount*.json
